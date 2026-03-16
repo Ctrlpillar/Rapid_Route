@@ -112,9 +112,8 @@ class AuthController extends Controller
             return response()->json(['message' => 'This email address is not registered.'], 404);
         }
 
-        if ($user->google_id) {
-            return response()->json(['message' => 'This account is linked with Google.'], 403);
-        }
+        // REMOVED: The block preventing Google-linked accounts from resetting their password.
+        // You can now freely test your main email with Mailtrap.
 
         $code = rand(100000, 999999);
 
@@ -186,8 +185,8 @@ class AuthController extends Controller
 
             $token = $user->createToken('auth_token')->plainTextToken;
             
-            // UPDATED: Now uses environment variable for the redirect
-            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            // UPDATED: Now safely reads from the config file to avoid cache traps
+            $frontendUrl = config('app.frontend_url', 'http://localhost:5173');
             return redirect($frontendUrl . "/login-success?token={$token}");
 
         } catch (Exception $e) {
