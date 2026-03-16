@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Team; 
-use App\Models\Order; // <-- ADDED THIS IMPORT
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -185,7 +185,10 @@ class AuthController extends Controller
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
-            return redirect("http://localhost:5173/login-success?token={$token}");
+            
+            // UPDATED: Now uses environment variable for the redirect
+            $frontendUrl = env('FRONTEND_URL', 'http://localhost:5173');
+            return redirect($frontendUrl . "/login-success?token={$token}");
 
         } catch (Exception $e) {
             return response()->json(['error' => 'Google auth failed.'], 500);
