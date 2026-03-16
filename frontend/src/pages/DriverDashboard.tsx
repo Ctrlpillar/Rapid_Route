@@ -9,8 +9,8 @@ import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
-// --- IMPORT YOUR API UTILITY ---
-import API from "@/api"; 
+// We removed the global API interceptor to prevent Admin/Driver token collisions
+import axios from "axios"; 
 
 const STATUS_PRIORITY: Record<string, number> = {
   out_for_delivery: 1,
@@ -61,14 +61,13 @@ export default function DriverDashboard() {
   const fetchManifest = async () => {
     setLoading(true);
     try {
-      // CLEANER CALL: Auth header is added automatically by the interceptor
-      // We just need to ensure the interceptor checks for 'driver_token' as well!
-      const res = await API.get("/driver/manifest", {
+      // Direct axios call forces it to use the driver_token exclusively
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/driver/manifest`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("driver_token")}` }
       });
       setParcels(res.data);
     } catch (err: any) {
-      if (err.response?.status === 401) {
+      if (err.response?.status === 401 || err.response?.status === 403) {
         handleLogout();
       }
       toast({ variant: "destructive", title: "Sync Failed", description: "Could not load manifest." });
@@ -81,8 +80,8 @@ export default function DriverDashboard() {
     try {
       setParcels(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
       
-      // CLEANER CALL: Patch status using the API utility
-      await API.patch(`/driver/update-status/${id}`, 
+      // Direct axios patch call forces it to use the driver_token exclusively
+      await axios.patch(`${import.meta.env.VITE_API_URL}/driver/update-status/${id}`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${localStorage.getItem("driver_token")}` }}
       );
@@ -214,8 +213,8 @@ export default function DriverDashboard() {
                           <Button 
                             variant="outline" 
                             className="rounded-2xl h-12 font-bold border-slate-200 bg-white text-slate-700 hover:bg-slate-50 gap-2 shadow-sm"
-                            // 👇 FIXED MAPS LINK 👇
-                            onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(parcel.delivery_location)}`, '_blank')}
+                            // 👇 CORRECTED GOOGLE MAPS LINK 👇
+                            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcel.delivery_location)}`, '_blank')}
                           >
                             <Navigation className="w-4 h-4 text-blue-500" /> Maps
                           </Button>
