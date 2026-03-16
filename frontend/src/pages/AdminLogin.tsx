@@ -13,18 +13,23 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
   const [creds, setCreds] = useState({ email: "", password: "" });
 
-  const handleAdminLogin = async (e: React.FormEvent) => {
+ const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Calling a specific admin endpoint
-      const res = await axios.post("http://localhost:8000/api/admin/login", creds);
+      // 1. Send 'creds' (your state variable) instead of the undefined 'credentials'
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/admin/login`, creds);
       
-      localStorage.setItem("sb_token", res.data.token);
+      // 2. Access 'response.data' instead of 'res.data'
+      localStorage.setItem("sb_token", response.data.token);
       localStorage.setItem("is_admin", "true");
       
-      toast({ title: "Welcome, Admin", description: "Accessing RapidRoute Command Center." });
+      toast({ 
+        title: "Welcome, Admin", 
+        description: "Accessing RapidRoute Command Center." 
+      });
+      
       navigate("/admin/dashboard");
     } catch (err: any) {
       toast({ 
