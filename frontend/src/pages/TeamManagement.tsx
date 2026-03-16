@@ -191,7 +191,7 @@ export default function TeamManagement() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label>
-                  <Input required type="tel" placeholder="+91 00000 00000" className="rounded-xl bg-slate-50 border-slate-200 h-12 font-medium" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
+                  <Input required type="number" pattern="[0-9]*"   placeholder="+91 00000 00000" className="rounded-xl bg-slate-50 border-slate-200 h-12 font-medium" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Assign Route</label>

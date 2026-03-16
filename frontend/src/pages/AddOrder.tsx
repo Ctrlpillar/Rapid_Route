@@ -244,7 +244,7 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Phone *</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input value={form.customerPhone} onChange={e => setForm({...form, customerPhone: e.target.value})} placeholder="+91 98xxx xxxxx" className={`pl-10 bg-slate-50/50 ${errors.customerPhone ? "border-red-400" : ""}`} />
+                    <Input  type="number" pattern="[0-9]*" value={form.customerPhone} onChange={e => setForm({...form, customerPhone: e.target.value})} placeholder="+91 98xxx xxxxx" className={`pl-10 bg-slate-50/50 ${errors.customerPhone ? "border-red-400" : ""}`} />
                   </div>
                 </div>
                 <div className="space-y-2">

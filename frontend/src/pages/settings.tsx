@@ -178,7 +178,7 @@ export default function Settings() {
                     <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email Address</label><Input type="email" value={formData.email} className="bg-slate-100 border-slate-200 rounded-xl h-12 font-medium text-slate-500 cursor-not-allowed" disabled /></div>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-6">
-                    <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label><Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+91 00000 00000" className="bg-slate-50 border-slate-200 rounded-xl h-12 font-medium" /></div>
+                    <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone Number</label><Input type="number" pattern="[0-9]*" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+91 00000 00000" className="bg-slate-50 border-slate-200 rounded-xl h-12 font-medium" /></div>
                     <div className="space-y-2"><label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Website</label><Input value={formData.website} onChange={e => setFormData({...formData, website: e.target.value})} placeholder="https://example.com" className="bg-slate-50 border-slate-200 rounded-xl h-12 font-medium" /></div>
                   </div>
                 </CardContent>
