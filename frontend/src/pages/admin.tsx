@@ -3,7 +3,6 @@ import {
   Users, Package, Trash2, CheckCircle2, Search,
   LayoutDashboard, LogOut, Zap, TrendingUp, PlusCircle, UserCog 
 } from "lucide-react";
-// --- NEW IMPORTS FOR FANCY DASHBOARD ---
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, Cell 
@@ -14,7 +13,9 @@ import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTeam } from "@/contexts/team-context";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+
+// --- IMPORT YOUR NEW API UTILITY ---
+import API from "@/api"; 
 
 // Components
 import AddOrder from "./AddOrder"; 
@@ -28,7 +29,7 @@ export type OrderStatus = "pending" | "approved" | "in_transit" | "out_for_deliv
 export interface AdminOrder {
   id: string; trackingNumber: string; orderName: string;
   customerName: string; customerEmail: string; customerPhone?: string;
-  deliveryLocation?: string; carrier: string; status: OrderStatus; createdAt: string; zipcode: string;formatted_weight?: string;
+  deliveryLocation?: string; carrier: string; status: OrderStatus; createdAt: string; zipcode: string; formatted_weight?: string;
 }
 
 // --- MOCK CHART DATA ---
@@ -58,7 +59,6 @@ function StatCard({ icon, label, value, sub, color }: { icon: React.ReactNode; l
   );
 }
 
-// --- NEW: CONFIRMATION MODAL COMPONENT ---
 function ConfirmDialog({ action, onConfirm, onCancel }: { action: any; onConfirm: () => void; onCancel: () => void }) {
   if (!action) return null;
   const isDelete = action.type.startsWith("delete");
@@ -87,12 +87,20 @@ export default function Admin() {
   const [tab, setTab] = useState<"dashboard" | "users" | "orders" | "add_order" | "team">("dashboard");
   
   const [orders, setOrders] = useState<AdminOrder[]>([]);
-  const [userCount, setUserCount] = useState(0); 
   const [confirmAction, setConfirmAction] = useState<any>(null);
+
+  // --- State for the live Dashboard Stats ---
+  const [stats, setStats] = useState({
+    total_shipments: 0,
+    total_customers: 0,
+    active_fleet: 0,
+    pending_orders: 0
+  });
 
   const fetchData = async () => {
     try {
-      const orderRes = await axios.get("http://localhost:8000/api/orders");
+      // 1. Fetch Orders List (URL is handled by API utility)
+      const orderRes = await API.get("/orders");
       const formattedOrders = orderRes.data.map((o: any) => ({
         id: o.id.toString(), 
         trackingNumber: o.tracking_number, 
@@ -108,10 +116,10 @@ export default function Admin() {
       }));
       setOrders(formattedOrders);
 
-      const userRes = await axios.get("http://localhost:8000/api/admin/users", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("sb_token")}` }
-      });
-      setUserCount(userRes.data.length);
+      // 2. Fetch live Dashboard Overview Stats (Headers handled automatically!)
+      const statsRes = await API.get("/admin/stats");
+      setStats(statsRes.data);
+
     } catch (err) { console.error("Sync failed", err); }
   };
 
@@ -131,48 +139,45 @@ export default function Admin() {
     navigate("/admin");
   };
 
-  // --- RESTORED: STATUS UPDATE LOGIC ---
   const updateOrderStatus = async (id: string, status: OrderStatus) => {
     try {
-      await axios.patch(`http://localhost:8000/api/orders/${id}/status`, 
-        { status },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("sb_token")}` }}
-      );
+      // Cleaner PATCH call
+      await API.patch(`/orders/${id}/status`, { status });
       
       setOrders(currentOrders => currentOrders.map(order => 
         order.id === id ? { ...order, status } : order
       ));
       
+      fetchData(); // Refresh stats after update
       toast({ title: "Status Updated", description: `Shipment is now marked as ${status.replace('_', ' ')}` });
     } catch (err) { 
       toast({ variant: "destructive", title: "Update Failed", description: "Could not update the database." }); 
     }
   };
 
-  // --- NEW: DELETE CONFIRMATION LOGIC ---
   const handleConfirmAction = async () => {
     if (!confirmAction) return;
     const { type, id } = confirmAction;
     try {
       if (type === "delete_order") {
-        await axios.delete(`http://localhost:8000/api/orders/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("sb_token")}` }
-        });
+        // Cleaner DELETE call
+        await API.delete(`/orders/${id}`);
         setOrders(o => o.filter(x => x.id !== id));
+        fetchData(); 
         toast({ title: "Deleted", description: "Order successfully removed." });
       }
     } catch (err) {
       toast({ variant: "destructive", title: "Error", description: "Action failed." });
     }
-    setConfirmAction(null); // Close modal
+    setConfirmAction(null); 
   };
 
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" /> },
-    { id: "users", label: "Users", icon: <Users className="w-4 h-4" />, badge: userCount > 0 ? userCount : null },
-    { id: "orders", label: "Orders", icon: <Package className="w-4 h-4" />, badge: orders.filter(o => o.status === "pending").length },
+    { id: "users", label: "Users", icon: <Users className="w-4 h-4" />, badge: stats.total_customers > 0 ? stats.total_customers : null },
+    { id: "orders", label: "Orders", icon: <Package className="w-4 h-4" />, badge: stats.pending_orders > 0 ? stats.pending_orders : null },
     { id: "add_order", label: "Add Order", icon: <PlusCircle className="w-4 h-4" /> },
-    { id: "team", label: "Team", icon: <UserCog className="w-4 h-4" /> }, 
+    { id: "team", label: "Team", icon: <UserCog className="w-4 h-4" />, badge: stats.active_fleet > 0 ? stats.active_fleet : null }, 
   ];
 
   const Sidebar = () => (
@@ -195,7 +200,6 @@ export default function Admin() {
           </button>
         ))}
       </nav>
-      {/* Sidebar Logout Button */}
       <div className="p-6 border-t border-slate-50">
         <button 
           onClick={handleLogout} 
@@ -219,7 +223,6 @@ export default function Admin() {
                <div className="w-8 h-8 rounded-xl bg-primary text-white text-[10px] flex items-center justify-center font-black shadow-lg shadow-primary/20">AD</div>
                <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">Control Hub</span>
              </div>
-             {/* Header Quick Logout Button */}
              <Button 
                 variant="ghost" 
                 size="icon" 
@@ -238,12 +241,14 @@ export default function Admin() {
               {tab === "dashboard" && (
                 <div className="space-y-10">
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <StatCard icon={<Users className="w-6 h-6 text-blue-600" />} label="Total Users" value={userCount} sub="Network Registry" color="bg-blue-50" />
-                    <StatCard icon={<Package className="w-6 h-6 text-violet-600" />} label="Total Orders" value={orders.length} sub="Manifest Volume" color="bg-violet-50" />
-                    <StatCard icon={<CheckCircle2 className="w-6 h-6 text-emerald-600" />} label="Delivered" value={orders.filter(o => o.status === "delivered").length} sub="Success Rate 98%" color="bg-emerald-50" />
-                    <StatCard icon={<TrendingUp className="w-6 h-6 text-amber-600" />} label="Active" value={orders.filter(o => o.status === "in_transit" || o.status === "out_for_delivery").length} sub="Live on Road" color="bg-amber-50" />
+                    {/* Wired to live database counts */}
+                    <StatCard icon={<Users className="w-6 h-6 text-blue-600" />} label="Total Users" value={stats.total_customers} sub="Network Registry" color="bg-blue-50" />
+                    <StatCard icon={<Package className="w-6 h-6 text-violet-600" />} label="Total Orders" value={stats.total_shipments} sub="Manifest Volume" color="bg-violet-50" />
+                    <StatCard icon={<UserCog className="w-6 h-6 text-emerald-600" />} label="Active Fleet" value={stats.active_fleet} sub="Drivers on Road" color="bg-emerald-50" />
+                    <StatCard icon={<TrendingUp className="w-6 h-6 text-amber-600" />} label="Pending" value={stats.pending_orders} sub="Requires Action" color="bg-amber-50" />
                   </div>
 
+                  {/* Shipment Volume Chart */}
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                     <Card className="lg:col-span-2 border-none shadow-sm rounded-[2.5rem] bg-white p-10">
                       <div className="mb-8">
@@ -269,6 +274,7 @@ export default function Admin() {
                       </div>
                     </Card>
 
+                    {/* System Feed */}
                     <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden">
                       <div className="p-10 border-b border-slate-50">
                         <h3 className="text-xl font-black text-slate-900 tracking-tight">System Feed</h3>
@@ -300,31 +306,25 @@ export default function Admin() {
               )}
 
               {tab === "users" && <UsersTab onUpdateStats={fetchData} />}
-
               {tab === "orders" && (
                 <OrdersTab 
                   orders={orders} 
-                  onUpdateStatus={updateOrderStatus} // --- THE FIX IS APPLIED HERE ---
+                  onUpdateStatus={updateOrderStatus}
                   onDeleteClick={(id, label) => setConfirmAction({ type: "delete_order", id, label })} 
                 />
               )}
-
               {tab === "add_order" && <AddOrder onAddOrders={() => fetchData()} onViewOrders={() => setTab("orders")} />}
-
               {tab === "team" && <TeamManagement />}
-
             </motion.div>
           </AnimatePresence>
         </main>
       </div>
 
-      {/* --- NEW: RENDER THE CONFIRMATION MODAL --- */}
       <ConfirmDialog 
         action={confirmAction} 
         onConfirm={handleConfirmAction} 
         onCancel={() => setConfirmAction(null)} 
       />
-
     </div>
   );
 }

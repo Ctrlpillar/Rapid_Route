@@ -8,10 +8,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
 
-// --- 1. PRIORITY SORTING LOGIC ---
-// This ensures drivers see the most urgent tasks at the top of their screen
+// --- IMPORT YOUR API UTILITY ---
+import API from "@/api"; 
+
 const STATUS_PRIORITY: Record<string, number> = {
   out_for_delivery: 1,
   in_transit: 2,
@@ -19,8 +19,6 @@ const STATUS_PRIORITY: Record<string, number> = {
   pending: 4,
 };
 
-// --- 2. PROGRESSIVE STATE MACHINE ---
-// Dictates what the button looks like and what it does next
 const getActionConfig = (status: string) => {
   switch (status) {
     case 'pending': 
@@ -36,8 +34,6 @@ const getActionConfig = (status: string) => {
   }
 };
 
-// --- 3. DYNAMIC STATUS STYLES ---
-// Colors the side-bar and the status pill
 const getStatusStyles = (status: string) => {
   switch (status) {
     case 'pending': return { bar: 'bg-amber-400', pill: 'bg-amber-100 text-amber-700' };
@@ -65,7 +61,9 @@ export default function DriverDashboard() {
   const fetchManifest = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:8000/api/driver/manifest", {
+      // CLEANER CALL: Auth header is added automatically by the interceptor
+      // We just need to ensure the interceptor checks for 'driver_token' as well!
+      const res = await API.get("/driver/manifest", {
         headers: { Authorization: `Bearer ${localStorage.getItem("driver_token")}` }
       });
       setParcels(res.data);
@@ -73,7 +71,7 @@ export default function DriverDashboard() {
       if (err.response?.status === 401) {
         handleLogout();
       }
-      toast({ variant: "destructive", title: "Sync Failed", description: "Could not load your route manifest." });
+      toast({ variant: "destructive", title: "Sync Failed", description: "Could not load manifest." });
     } finally {
       setLoading(false);
     }
@@ -81,24 +79,22 @@ export default function DriverDashboard() {
 
   const handleUpdateStatus = async (id: number, newStatus: string, customerName: string) => {
     try {
-      // Optimistic UI Update: Makes the button feel instantly responsive
       setParcels(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
       
-      await axios.patch(`http://localhost:8000/api/driver/update-status/${id}`, 
+      // CLEANER CALL: Patch status using the API utility
+      await API.patch(`/driver/update-status/${id}`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${localStorage.getItem("driver_token")}` }}
       );
       
       toast({ title: "Status Updated", description: `${customerName}'s package is now ${newStatus.replace(/_/g, ' ')}.` });
       
-      // If it's delivered, wait a brief moment then fetch to remove it from the list smoothly
       if (newStatus === 'delivered') {
         setTimeout(() => fetchManifest(), 1000);
       }
     } catch (e) {
-      // Revert if API fails
       fetchManifest();
-      toast({ variant: "destructive", title: "Update Failed", description: "Check your connection and try again." });
+      toast({ variant: "destructive", title: "Update Failed", description: "Check your connection." });
     }
   };
 
@@ -109,7 +105,6 @@ export default function DriverDashboard() {
     navigate("/driver-login"); 
   };
 
-  // Filter and SORT the parcels by urgency
   const sortedAndFilteredParcels = parcels
     .filter(p => 
       p.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -123,7 +118,6 @@ export default function DriverDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24 text-slate-900 font-sans">
-      {/* Header Section */}
       <div className="bg-white border-b border-slate-200 px-6 py-6 sticky top-0 z-10 shadow-sm rounded-b-[2rem]">
         <div className="max-w-md mx-auto flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -176,7 +170,6 @@ export default function DriverDashboard() {
             </div>
 
             {sortedAndFilteredParcels.map((parcel) => {
-              // Get dynamic configurations for this specific parcel
               const action = getActionConfig(parcel.status);
               const styles = getStatusStyles(parcel.status);
               const ActionIcon = action.Icon;
@@ -185,7 +178,6 @@ export default function DriverDashboard() {
                 <Card key={parcel.id} className="border-none shadow-sm rounded-3xl bg-white overflow-hidden active:scale-[0.98] transition-all">
                   <CardContent className="p-0">
                     <div className="flex items-stretch min-h-[140px]">
-                      {/* Dynamic Status Bar Indicator */}
                       <div className={`w-1.5 transition-colors duration-300 ${styles.bar}`} />
                       
                       <div className="flex-1 p-5 flex flex-col justify-between">
@@ -196,7 +188,6 @@ export default function DriverDashboard() {
                           </div>
                           
                           <div className="flex flex-col items-end gap-1.5">
-                            {/* Dynamic Status Pill */}
                             <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${styles.pill}`}>
                               {parcel.status.replace(/_/g, ' ')}
                             </span>
@@ -212,7 +203,6 @@ export default function DriverDashboard() {
                           </div>
                         </div>
 
-                        {/* Location Display */}
                         <div className="flex items-start gap-2 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                           <MapPin className="w-4 h-4 mt-0.5 text-slate-400 flex-shrink-0" />
                           <p className="text-xs font-medium text-slate-600 line-clamp-2 leading-relaxed">
@@ -220,17 +210,16 @@ export default function DriverDashboard() {
                           </p>
                         </div>
 
-                        {/* Action Buttons */}
                         <div className="grid grid-cols-[1fr_2fr] gap-3">
                           <Button 
                             variant="outline" 
                             className="rounded-2xl h-12 font-bold border-slate-200 bg-white text-slate-700 hover:bg-slate-50 gap-2 shadow-sm"
-                            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(parcel.delivery_location)}`)}
+                            // 👇 FIXED MAPS LINK 👇
+                            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcel.delivery_location)}`)}
                           >
                             <Navigation className="w-4 h-4 text-blue-500" /> Maps
                           </Button>
                           
-                          {/* DYNAMIC PROGRESSIVE BUTTON */}
                           <Button 
                             disabled={action.disabled}
                             className={`rounded-2xl h-12 font-bold shadow-md gap-2 transition-all duration-300 ${action.color}`}
@@ -249,7 +238,6 @@ export default function DriverDashboard() {
         )}
       </div>
 
-      {/* Persistent Sync Button */}
       {!loading && parcels.length > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-20">
           <Button 

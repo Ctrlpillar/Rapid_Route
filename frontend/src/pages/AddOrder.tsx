@@ -3,9 +3,11 @@ import { PlusCircle, UploadCloud, FileText, Loader2, Phone, Mail, MapPin, Truck,
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import axios from "axios";
 import { useToast } from "@/hooks/use-toast";
 import type { AdminOrder, OrderStatus } from "./admin";
+
+// --- IMPORT YOUR API UTILITY ---
+import API from "@/api"; 
 
 // 1. DEFINE YOUR FLEET AND ROUTES (Goa Zones)
 const GOA_ROUTES: Record<string, string[]> = {
@@ -29,7 +31,7 @@ const getTruckForPin = (pin: string) => {
 const EMPTY_FORM = { 
   trackingNumber: "", 
   itemName: "", 
-  weight: 10, // Default 10g
+  weight: 10, 
   customerName: "", 
   customerEmail: "", 
   customerPhone: "",
@@ -53,7 +55,6 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
     }
   }, [form.zipcode]);
 
-  // Logic to handle the display of weight (1000g -> 1kg)
   const formatWeight = (grams: number) => {
     if (grams >= 1000) {
       const kg = grams / 1000;
@@ -68,7 +69,7 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
       const dbPayload = orders.map(o => ({
         tracking_number: o.trackingNumber,
         item_name: o.itemName, 
-        weight: o.weight, // Send the raw numeric grams to DB
+        weight: o.weight, 
         customer_name: o.customerName,
         customer_email: o.customerEmail,
         customer_phone: o.customerPhone, 
@@ -78,9 +79,9 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
         status: o.status
       }));
 
-      const res = await axios.post("http://localhost:8000/api/orders", { orders: dbPayload }, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("sb_token")}` }
-      });
+      // CLEANER CALL: URL is just "/orders", headers are automatic
+      const res = await API.post("/orders", { orders: dbPayload });
+      
       onAddOrders(orders);
       toast({ title: "Sync Successful", description: res.data.message });
       return true;
@@ -139,11 +140,9 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
     formData.append("file", file);
 
     try {
-      const res = await axios.post("http://localhost:8000/api/orders/bulk-upload", formData, {
-        headers: { 
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("sb_token")}`
-        }
+      // CLEANER CALL: Authorization is now automatic
+      const res = await API.post("/orders/bulk-upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
       toast({ title: "Import Successful", description: res.data.message });
       onViewOrders(); 
@@ -191,14 +190,11 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
                 </div>
               </div>
 
-              {/* --- NEW: PACKAGE WEIGHT SLIDER --- */}
               <div className="space-y-4 bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center gap-2">
                     <Scale className="w-4 h-4 text-primary" />
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                      Package Weight
-                    </label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">Package Weight</label>
                   </div>
                   <span className="text-sm font-black text-white bg-primary px-3 py-1 rounded-lg shadow-md shadow-primary/20">
                     {formatWeight(form.weight)}
@@ -309,9 +305,7 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
       )}
 
       <div className="mt-8 text-center">
-        <button onClick={onViewOrders} className="text-sm text-primary hover:underline font-bold">
-          View all active shipments →
-        </button>
+        <button onClick={onViewOrders} className="text-sm text-primary hover:underline font-bold">View all active shipments →</button>
       </div>
     </div>
   );

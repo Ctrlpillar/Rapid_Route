@@ -10,7 +10,9 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useAuth } from "@/contexts/auth-context";
 import { useLocation } from "wouter";
-import axios from "axios";
+
+// --- IMPORT YOUR CENTRALIZED API UTILITY ---
+import API from "@/api"; 
 
 (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl = undefined;
 L.Icon.Default.mergeOptions({
@@ -20,7 +22,7 @@ L.Icon.Default.mergeOptions({
 });
 
 // --- CONSTANTS & ICONS ---
-const HQ_POS: [number, number] = [15.4909, 73.8278]; // Panaji HQ
+const HQ_POS: [number, number] = [15.4909, 73.8278]; 
 const DEFAULT_ZOOM = 12;
 
 const truckIcon = new L.DivIcon({
@@ -82,7 +84,7 @@ function TrackingMap({ route, currentStop, center, zoom, isSearching }: {
               const isActive = i === activeStop;
               const isDestination = i === route.length - 1;
               const isCompleted = i < activeStop;
-              const icon = isActive ? (isDestination ? deliveredIcon : truckIcon) : isDestination ? destinationIcon : isCompleted ? waypointIcon : waypointIcon;
+              const icon = isActive ? (isDestination ? deliveredIcon : truckIcon) : isDestination ? destinationIcon : waypointIcon;
               return (
                 <Marker key={i} position={point.pos} icon={icon}>
                   <Popup><div className="text-sm"><p className="font-semibold">{point.label}</p><p className="text-gray-400 text-xs mt-0.5">{point.time}</p></div></Popup>
@@ -138,9 +140,8 @@ export default function Track() {
     window.history.replaceState(null, "", `/track?number=${encodeURIComponent(t)}`);
 
     try {
-      const response = await axios.get(`http://localhost:8000/api/track/${t}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("sb_token")}` }
-      });
+      // CLEANER CALL: Base URL and Headers handled automatically
+      const response = await API.get(`/track/${t}`);
       const data = response.data;
 
       let destinationPos: [number, number] = [15.2993, 74.124];
@@ -203,44 +204,44 @@ export default function Track() {
   const mapCenter: [number, number] = isSearching ? (mapRoute[mapStop]?.pos || HQ_POS) : HQ_POS;
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-slate-50 pb-20">
+    <div className="flex flex-col w-full min-h-screen bg-slate-50 pb-20 font-sans">
       <div className="bg-white border-b border-border pt-12 pb-8 px-4">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Track your order</h1>
-          <p className="text-muted-foreground mb-6">Welcome back, {user?.name?.split(" ")[0]}! View your live shipment updates.</p>
-          <form onSubmit={(e) => { e.preventDefault(); handleSearchNumber(); }} className="flex gap-3 max-w-2xl bg-slate-50 p-2 rounded-2xl border border-border focus-within:border-primary/50 focus-within:ring-4 focus-within:ring-primary/10 transition-all">
+          <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight mb-2">Track Order</h1>
+          <p className="text-slate-400 font-medium mb-6">Hello, {user?.name?.split(" ")[0]}! Monitor your active shipments in real-time.</p>
+          <form onSubmit={(e) => { e.preventDefault(); handleSearchNumber(); }} className="flex gap-3 max-w-2xl bg-slate-100/50 p-2.5 rounded-2xl border border-slate-200 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/10 transition-all">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-              <Input value={searchInput} onChange={e => setSearchInput(e.target.value)} placeholder="Search tracking number..." className="w-full pl-10 h-12 bg-transparent border-none shadow-none focus-visible:ring-0 text-base" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Input value={searchInput} onChange={e => setSearchInput(e.target.value)} placeholder="Enter tracking ID (e.g. RR-GOA-2026)" className="w-full pl-10 h-12 bg-transparent border-none shadow-none focus-visible:ring-0 text-base font-medium" />
             </div>
-            <Button type="submit" disabled={isSearchLoading} className="h-12 rounded-xl px-8">{isSearchLoading ? "Searching..." : "Track"}</Button>
+            <Button type="submit" disabled={isSearchLoading} className="h-12 rounded-xl px-10 font-bold shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">{isSearchLoading ? "Locating..." : "Track"}</Button>
           </form>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto w-full px-4 mt-8 space-y-6">
-        {searchError && <div className="bg-destructive/10 text-destructive p-5 rounded-2xl border border-destructive/20 font-semibold">{searchError}</div>}
+        {searchError && <div className="bg-red-50 text-red-600 p-5 rounded-2xl border border-red-100 font-bold text-sm tracking-wide">{searchError}</div>}
         {isSearchLoading && <Skeleton className="w-full h-24 rounded-2xl" />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           <div className="space-y-6">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h2 className="font-bold text-lg text-foreground">Recent Searches</h2>
+              <div className="flex items-center justify-between px-1">
+                <h2 className="font-black text-lg text-slate-900 tracking-tight uppercase">Recent</h2>
                 {recentSearches.length > 0 && (
-                  <button onClick={() => { localStorage.removeItem("rapidroute_recent_searches"); setRecentSearches([]); }} className="text-[10px] uppercase font-bold text-muted-foreground hover:text-red-500 transition-colors">Clear</button>
+                  <button onClick={() => { localStorage.removeItem("rapidroute_recent_searches"); setRecentSearches([]); }} className="text-[10px] uppercase font-black text-slate-400 hover:text-red-500 transition-colors">Clear All</button>
                 )}
               </div>
               {recentSearches.length === 0 ? (
-                <div className="p-8 text-center bg-white border border-dashed rounded-2xl"><p className="text-xs text-muted-foreground">History is empty.</p></div>
+                <div className="p-10 text-center bg-white border border-dashed rounded-3xl"><p className="text-xs font-bold text-slate-300 uppercase tracking-widest">History is empty</p></div>
               ) : (
                 recentSearches.map(order => (
-                  <button key={order.trackingNumber} onClick={() => { setSearchResult(order); setSearchInput(order.trackingNumber); }} className={`w-full text-left rounded-2xl border p-4 transition-all ${searchResult?.trackingNumber === order.trackingNumber ? "border-primary bg-primary/5 shadow-md shadow-primary/10" : "border-border bg-white hover:border-primary/40 hover:shadow-sm"}`}>
-                    <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"><Package className="w-4 h-4 text-primary" /></div>
+                  <button key={order.trackingNumber} onClick={() => { setSearchResult(order); setSearchInput(order.trackingNumber); }} className={`w-full text-left rounded-3xl border p-5 transition-all ${searchResult?.trackingNumber === order.trackingNumber ? "border-primary bg-primary/5 shadow-xl shadow-primary/10 scale-[1.02]" : "border-slate-100 bg-white hover:border-primary/40 hover:shadow-md"}`}>
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0"><Package className="w-5 h-5 text-primary" /></div>
                       <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2 mb-1"><p className="text-sm font-semibold text-foreground truncate">{order.item}</p><ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" /></div>
-                        <p className="text-[10px] font-mono text-muted-foreground mb-2">{order.trackingNumber}</p>
+                        <div className="flex items-center justify-between gap-2 mb-1.5"><p className="text-sm font-black text-slate-900 truncate tracking-tight">{order.item}</p><ChevronRight className="w-4 h-4 text-slate-300 flex-shrink-0" /></div>
+                        <p className="text-[10px] font-black font-mono text-slate-400 mb-3 tracking-tighter">{order.trackingNumber}</p>
                         <StatusBadge status={order.status} />
                       </div>
                     </div>
@@ -251,16 +252,16 @@ export default function Track() {
           </div>
 
           <div className="space-y-6 lg:col-span-2">
-            <Card className="rounded-3xl shadow-sm border-border/60 overflow-hidden">
+            <Card className="rounded-[2.5rem] shadow-sm border-slate-100 overflow-hidden bg-white">
               <CardContent className="p-0">
-                <div className="px-6 pt-5 pb-3 flex items-center justify-between">
+                <div className="px-8 pt-7 pb-5 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-foreground">{isSearching ? searchResult.item : "Regional Hub"}</h3>
-                    <p className="text-sm text-muted-foreground">{isSearching ? searchResult.currentLocation : "Panaji Main Hub, Goa"}</p>
+                    <h3 className="text-xl font-black text-slate-900 tracking-tight">{isSearching ? searchResult.item : "Network Center"}</h3>
+                    <p className="text-sm font-medium text-slate-400">{isSearching ? searchResult.currentLocation : "RapidRoute Panaji Hub, Goa"}</p>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">
-                    <span className={`w-1.5 h-1.5 rounded-full ${isSearching ? 'bg-green-500 animate-pulse' : 'bg-slate-400'}`} />
-                    {isSearching ? 'Live Tracking' : 'HQ Status: Online'}
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-50 text-slate-600 text-[10px] font-black uppercase tracking-widest border border-slate-100">
+                    <span className={`w-2 h-2 rounded-full ${isSearching ? 'bg-green-500 animate-pulse' : 'bg-slate-300'}`} />
+                    {isSearching ? 'Live' : 'Hub Online'}
                   </span>
                 </div>
                 <div className="mx-4 mb-4"><TrackingMap route={mapRoute} currentStop={mapStop} center={mapCenter} zoom={isSearching ? 13 : DEFAULT_ZOOM} isSearching={isSearching} /></div>
@@ -269,66 +270,64 @@ export default function Track() {
 
             <AnimatePresence mode="wait">
               {searchResult && (
-                <motion.div key={searchResult.trackingNumber} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-4" >
-                  <Card className="rounded-3xl shadow-sm border-border/60 overflow-hidden">
-                    <div className={`px-7 py-5 text-white ${searchResult.status.toLowerCase().includes("delivered") ? "bg-gradient-to-r from-green-500 to-emerald-400" : "bg-gradient-to-r from-primary to-blue-500"}`}>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Truck className="w-5 h-5" />
-                        <span className="text-xs font-semibold opacity-80 uppercase tracking-wider">{searchResult.carrier}</span>
+                <motion.div key={searchResult.trackingNumber} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6" >
+                  <Card className="rounded-[2.5rem] shadow-sm border-slate-100 overflow-hidden bg-white">
+                    <div className={`px-8 py-7 text-white ${searchResult.status.toLowerCase().includes("delivered") ? "bg-gradient-to-br from-emerald-600 to-green-500" : "bg-gradient-to-br from-primary to-blue-600"}`}>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Truck className="w-5 h-5 opacity-80" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{searchResult.carrier}</span>
                       </div>
                       
-                      <h2 className="text-xl font-bold capitalize">{searchResult.status.replace(/_/g, ' ')}</h2>
-                      <p className="opacity-80 text-sm mt-0.5 truncate">{searchResult.currentLocation}</p>
+                      <h2 className="text-3xl font-black capitalize tracking-tight">{searchResult.status.replace(/_/g, ' ')}</h2>
+                      <p className="opacity-80 text-sm font-medium mt-1 truncate">{searchResult.currentLocation}</p>
                       
-                      {/* --- UPDATED: High-visibility Driver Phone Pill in the Blue Header --- */}
                       {searchResult.status.toLowerCase().includes("out") && searchResult.status.toLowerCase().includes("delivery") && searchResult.driverPhone && (
-                        <div className="mt-4 inline-flex items-center gap-2.5 bg-white/20 hover:bg-white/30 transition-colors border border-white/30 backdrop-blur-md px-4 py-2.5 rounded-xl shadow-sm">
-                          <div className="bg-white/90 p-1.5 rounded-lg flex-shrink-0">
-                            <Phone className="w-4 h-4 text-blue-600" />
+                        <div className="mt-6 inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 transition-all border border-white/20 backdrop-blur-md px-5 py-3 rounded-2xl shadow-xl">
+                          <div className="bg-white p-2 rounded-xl flex-shrink-0 shadow-inner">
+                            <Phone className="w-5 h-5 text-blue-600" />
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-white/80 uppercase tracking-widest leading-none mb-1">Driver Contact</span>
-                            <span className="text-sm font-black text-white leading-none tracking-wide">{searchResult.driverPhone}</span>
+                            <span className="text-[10px] font-black text-white/70 uppercase tracking-widest leading-none mb-1.5">Direct Line</span>
+                            <span className="text-base font-black text-white leading-none tracking-wider">{searchResult.driverPhone}</span>
                           </div>
                         </div>
                       )}
                     </div>
                     
-                    <CardContent className="p-6">
-                      {/* --- RESTORED: Standard 3-column grid without the phone number --- */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0"><PackageCheck className="w-4 h-4 text-primary" /></div>
-                          <div className="min-w-0"><p className="text-xs text-muted-foreground">Tracking #</p><p className="font-semibold text-sm truncate">{searchResult.trackingNumber}</p></div>
+                    <CardContent className="p-8">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-primary/5 rounded-[1rem] flex items-center justify-center flex-shrink-0 border border-primary/10"><PackageCheck className="w-6 h-6 text-primary" /></div>
+                          <div className="min-w-0"><p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Tracking ID</p><p className="font-bold text-sm text-slate-900 truncate font-mono">{searchResult.trackingNumber}</p></div>
                         </div>
                         
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0"><Clock className="w-4 h-4 text-green-600" /></div>
-                          <div className="min-w-0"><p className="text-xs text-muted-foreground">Est. Delivery</p><p className="font-semibold text-sm truncate">{searchResult.estimatedDelivery}</p></div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-emerald-50 rounded-[1rem] flex items-center justify-center flex-shrink-0 border border-emerald-100"><Clock className="w-6 h-6 text-emerald-600" /></div>
+                          <div className="min-w-0"><p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">ETA</p><p className="font-bold text-sm text-slate-900 truncate">{searchResult.estimatedDelivery}</p></div>
                         </div>
                         
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0"><MapPin className="w-4 h-4 text-orange-600" /></div>
-                          <div className="min-w-0"><p className="text-xs text-muted-foreground">Location</p><p className="font-semibold text-sm leading-tight line-clamp-2" title={searchResult.currentLocation}>{searchResult.currentLocation}</p></div>
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 bg-amber-50 rounded-[1rem] flex items-center justify-center flex-shrink-0 border border-amber-100"><MapPin className="w-6 h-6 text-amber-600" /></div>
+                          <div className="min-w-0"><p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-1">Current Point</p><p className="font-bold text-sm text-slate-900 leading-tight line-clamp-2">{searchResult.currentLocation}</p></div>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card className="rounded-3xl shadow-sm border-border/60">
-                    <CardContent className="p-7">
-                      <h3 className="text-lg font-bold mb-5">Shipment History</h3>
+                  <Card className="rounded-[2.5rem] shadow-sm border-slate-100 bg-white">
+                    <CardContent className="p-10">
+                      <h3 className="text-xl font-black text-slate-900 mb-8 tracking-tight uppercase">Manifest History</h3>
                       <div className="space-y-0">
                         {searchResult.events.map((event, i) => (
-                          <div key={i} className="flex gap-4">
+                          <div key={i} className="flex gap-6">
                             <div className="flex flex-col items-center">
-                              <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 ${i === 0 ? "bg-primary border-primary" : "bg-white border-border"}`} />
-                              {i < (searchResult.events.length - 1) && <div className="w-0.5 bg-border flex-1 my-1" style={{ minHeight: "2rem" }} />}
+                              <div className={`w-5 h-5 rounded-full border-4 flex-shrink-0 transition-all ${i === 0 ? "bg-primary border-primary/20 scale-110" : "bg-white border-slate-100"}`} />
+                              {i < (searchResult.events.length - 1) && <div className="w-1 bg-slate-50 flex-1 my-2 rounded-full" style={{ minHeight: "3rem" }} />}
                             </div>
-                            <div className="pb-5">
-                              <p className="font-semibold text-sm text-foreground">{event.description}</p>
-                              <p className="text-xs text-muted-foreground mt-0.5">{event.location}</p>
-                              <p className="text-xs text-muted-foreground/70 mt-0.5">{event.date}</p>
+                            <div className="pb-8">
+                              <p className={`font-black text-sm tracking-tight ${i === 0 ? "text-slate-900" : "text-slate-500"}`}>{event.description}</p>
+                              <p className="text-xs font-bold text-slate-400 mt-1 uppercase tracking-widest">{event.location}</p>
+                              <p className="text-[10px] font-bold text-slate-300 mt-1 uppercase tracking-tighter">{event.date}</p>
                             </div>
                           </div>
                         ))}

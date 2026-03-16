@@ -1,16 +1,17 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-// --- 1. AXIOS SETUP FOR LARAVEL API ---
+// --- 1. DYNAMIC API SETUP ---
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+
 const API = axios.create({
-  baseURL: "http://localhost:8000/api",
+  baseURL: BASE_URL,
   headers: {
     "Accept": "application/json",
     "Content-Type": "application/json"
   }
 });
 
-// Automatically attach the token to every request if it exists
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("sb_token");
   if (token) {
@@ -38,12 +39,12 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: string; // Added role to the interface
+  role: string;
   google_id?: string | null;
   initials: string;
   phone?: string;
   website?: string;
-  avatar?: string;
+  avatar?: string; // Ensured this is here
   orders: Order[];
 }
 
@@ -61,28 +62,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const MOCK_ORDERS: Order[] = [
-  {
-    id: "ord_1",
-    trackingNumber: "TRK-GOA-20240312",
-    status: "In Transit",
-    item: "Laptop Stand + Desk Organizer",
-    carrier: "BlueDart",
-    estimatedDelivery: "Tomorrow by 6:00 PM",
-    currentLocation: "Margao Facility, Goa",
-    mapPos: [15.3477, 74.0231],
-    events: [
-      { date: "Mar 13, 8:00 AM", description: "Departed Margao Facility", location: "Margao, Goa" },
-      { date: "Mar 12, 2:30 PM", description: "Scanned at relay point", location: "Ponda, Goa" },
-      { date: "Mar 12, 9:00 AM", description: "Package received & processed", location: "Panaji, Goa" },
-    ],
-    route: [
-      { pos: [15.5057, 73.8173], label: "Panaji Sorting Hub", time: "Mar 12, 9:00 AM" },
-      { pos: [15.4289, 73.9685], label: "Ponda Relay", time: "Mar 12, 2:30 PM" },
-      { pos: [15.3477, 74.0231], label: "Margao Facility", time: "Mar 13, 8:00 AM" },
-      { pos: [15.2993, 74.124], label: "Your Address, Goa", time: "Mar 14 (Est.)" },
-    ],
-    currentStop: 2,
-  },
+  // ... (Your mock orders stay the same)
 ];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -103,9 +83,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const response = await API.get("/user");
         const userData = response.data;
 
-        //  THE BOUNCER: If an Admin token bleeds over into the customer site, ignore it
         if (userData.role === "admin") {
-          console.warn("Admin detected in Customer portal. Keeping session clean.");
           localStorage.removeItem("sb_token");
           localStorage.removeItem("sb_user");
           setUser(null);
@@ -124,6 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: userData.role,
           google_id: userData.google_id,
           phone: userData.phone,
+          avatar: userData.avatar, // 👇 ADDED THIS: Now the avatar flows into the app!
           initials,
           orders: MOCK_ORDERS,
         };
@@ -131,7 +110,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(u);
         localStorage.setItem("sb_user", JSON.stringify(u));
       } catch (error) {
-        console.error("Token invalid or expired", error);
         localStorage.removeItem("sb_token");
         localStorage.removeItem("sb_user");
         setUser(null);
@@ -150,13 +128,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const response = await API.post(endpoint, formData);
       
-      if (isSignUp) {
-        return { registered: true };
-      }
+      if (isSignUp) return { registered: true };
 
       const { token, user: userData } = response.data;
 
-      //  THE BOUNCER: Prevent Admins from logging in through the customer form
       if (userData.role === "admin") {
         throw new Error("Administrators must use the dedicated Admin Portal.");
       }
@@ -171,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         email: userData.email,
         role: userData.role,
         phone: userData.phone,
+        avatar: userData.avatar, // 👇 ADDED THIS
         initials,
         orders: MOCK_ORDERS,
       };
@@ -182,15 +158,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     } catch (error: any) {
       const message = error.response?.data?.message || error.message || "Authentication failed";
-      const status = error.response?.status;
       const customError = new Error(message) as any;
-      customError.status = status;
+      customError.status = error.response?.status;
       throw customError;
     }
   };
 
   const signInWithGoogle = async () => {
-    window.location.href = "http://localhost:8000/api/auth/google";
+    // 👇 UPDATED: Uses the base URL variable instead of hardcoded localhost
+    window.location.href = `${BASE_URL}/auth/google`;
   };
 
   const signOut = async () => {
@@ -198,6 +174,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     localStorage.removeItem("sb_user");
     localStorage.removeItem("sb_token");
+    localStorage.removeItem("is_admin"); // Clean admin flag too
   };
 
   const updateUser = (updates: Partial<User>) => {

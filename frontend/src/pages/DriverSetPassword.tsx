@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
-import axios from "axios";
+
+// --- IMPORT YOUR API UTILITY ---
+import API from "@/api"; 
 
 export default function DriverSetPassword() {
   // Grab the token from the URL (e.g., ?token=wBUrhtg...)
@@ -37,13 +39,14 @@ export default function DriverSetPassword() {
 
     setLoading(true);
     try {
-      await axios.post("http://localhost:8000/api/driver/finalize-password", { 
+      // CLEANER CALL: URL is dynamic and headers are automatic
+      await API.post("/driver/finalize-password", { 
         token: token, 
         password: password 
       });
       
       toast({ title: "Identity Secured", description: "Password set successfully. You can now login." });
-      navigate("/driver-login"); // Redirect them to login!
+      navigate("/driver-login"); 
     } catch (err: any) {
       toast({ 
         variant: "destructive", 
@@ -62,19 +65,19 @@ export default function DriverSetPassword() {
           <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <ShieldCheck className="w-10 h-10 text-emerald-500" />
           </div>
-          <h1 className="text-2xl font-bold">Secure Your Account</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Secure Your Account</h1>
           <p className="text-slate-400 text-sm mt-2 font-medium">Create a private password for your fleet console.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-[10px] font-bold uppercase text-slate-500 ml-1 tracking-widest">New Private Password</label>
+            <label className="text-[10px] font-black uppercase text-slate-500 ml-1 tracking-widest">New Private Password</label>
             <div className="relative">
               <Input 
                 type={showPass ? "text" : "password"}
                 required 
                 placeholder="Minimum 8 characters"
-                className="h-14 rounded-2xl bg-white/5 border-white/10 pr-12 focus:ring-primary text-white"
+                className="h-14 rounded-2xl bg-white/5 border-white/10 pr-12 focus:ring-primary text-white font-medium"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -84,7 +87,7 @@ export default function DriverSetPassword() {
             </div>
           </div>
 
-          <Button type="submit" disabled={loading} className="w-full h-14 rounded-2xl text-md font-bold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 text-white">
+          <Button type="submit" disabled={loading} className="w-full h-14 rounded-2xl text-md font-black bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 text-white transition-all active:scale-[0.98]">
             {loading ? <Loader2 className="animate-spin w-5 h-5" /> : "Secure My Account"}
           </Button>
         </form>

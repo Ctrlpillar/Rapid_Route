@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
+
+// --- IMPORT YOUR CENTRALIZED API UTILITY ---
+import API from "@/api"; 
 
 interface AdminUser {
   id: string;
@@ -24,7 +26,6 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
-  // --- PAGINATION STATE ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -35,10 +36,8 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem("sb_token");
-      const res = await axios.get("http://localhost:8000/api/admin/users", {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // CLEANER CALL: Base URL handled by API utility, token attached by Interceptor
+      const res = await API.get("/admin/users");
       
       const formatted = res.data.map((u: any) => ({
         id: u.id.toString(),
@@ -54,7 +53,6 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
       setUsers(formatted);
       if (onUpdateStats) onUpdateStats();
     } catch (err: any) {
-      console.error("Fetch Users Error:", err);
       toast({ 
         variant: "destructive", 
         title: "Sync Error", 
@@ -69,12 +67,10 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
     if (!confirm(`Are you sure you want to delete ${name}'s account? This action cannot be undone.`)) return;
     
     try {
-      const token = localStorage.getItem("sb_token");
-      await axios.delete(`http://localhost:8000/api/users/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      // CLEANER CALL: Dynamic DELETE request
+      await API.delete(`/users/${id}`);
       
-      toast({ title: "Account Deleted", description: `${name} has been removed from the system.` });
+      toast({ title: "Account Deleted", description: `${name} has been removed.` });
       setUsers(prev => prev.filter(u => u.id !== id));
       if (onUpdateStats) onUpdateStats();
       
@@ -87,7 +83,6 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
     }
   };
 
-  // --- FILTERING & PAGINATION LOGIC ---
   const filteredUsers = users.filter(u => 
     u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -98,12 +93,10 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Reset to page 1 when search changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  // Physical Arrow Key Support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowLeft") setCurrentPage(p => Math.max(p - 1, 1));
@@ -114,81 +107,79 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
   }, [totalPages]);
 
   return (
-    <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden flex flex-col">
-      {/* Header & Search */}
-      <div className="p-6 border-b bg-white flex flex-col sm:flex-row justify-between items-center gap-4">
+    <Card className="border-none shadow-sm rounded-[2rem] bg-white overflow-hidden flex flex-col font-sans">
+      <div className="p-8 border-b border-slate-50 bg-white flex flex-col sm:flex-row justify-between items-center gap-6">
         <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input 
-            placeholder="Search by name or email..." 
-            className="pl-10 bg-slate-50 border-none rounded-xl focus-visible:ring-primary/20"
+            placeholder="Search registry..." 
+            className="pl-11 h-12 bg-slate-50 border-none rounded-2xl focus-visible:ring-primary/20 font-medium"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
         
         <div className="flex items-center gap-4">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
-              {filteredUsers.length} Customers
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+              {filteredUsers.length} Network Nodes
             </div>
-            <Button variant="ghost" size="icon" onClick={fetchUsers} disabled={loading} className="text-slate-400 hover:text-primary transition-colors">
-               <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+            <Button variant="ghost" size="icon" onClick={fetchUsers} disabled={loading} className="text-slate-300 hover:text-primary transition-all rounded-xl h-10 w-10">
+               <RefreshCcw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
             </Button>
         </div>
       </div>
       
-      {/* Content Area */}
       <div className="flex-1">
         {loading && users.length === 0 ? (
-          <div className="py-24 text-center">
-            <Loader2 className="animate-spin mx-auto text-primary w-8 h-8 opacity-20" />
-            <p className="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-4">Pulling Registry...</p>
+          <div className="py-32 text-center">
+            <Loader2 className="animate-spin mx-auto text-primary w-10 h-10 opacity-30" />
+            <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mt-6">Refreshing Registry...</p>
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="py-24 text-center">
-            <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <User className="w-8 h-8 text-slate-200" />
+          <div className="py-32 text-center">
+            <div className="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-slate-100">
+              <User className="w-10 h-10 text-slate-200" />
             </div>
-            <p className="text-slate-500 font-bold">No customers found.</p>
-            <p className="text-xs text-slate-400">Try adjusting your search criteria.</p>
+            <p className="text-slate-900 font-black tracking-tight">No match found</p>
+            <p className="text-xs text-slate-400 font-medium mt-1 uppercase tracking-widest">Try adjusting search parameters</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto px-4 pb-4">
+            <table className="w-full text-left border-separate border-spacing-y-2">
               <thead>
-                <tr className="bg-slate-50/50 text-[10px] uppercase tracking-widest font-bold text-slate-400">
-                  <th className="px-6 py-4">Customer</th>
-                  <th className="px-6 py-4">Contact</th>
-                  <th className="px-6 py-4">Joined</th>
-                  <th className="px-6 py-4 text-right">Actions</th>
+                <tr className="text-[10px] uppercase tracking-[0.15em] font-black text-slate-400">
+                  <th className="px-6 py-4">Identity</th>
+                  <th className="px-6 py-4">Access Link</th>
+                  <th className="px-6 py-4">Registry Date</th>
+                  <th className="px-6 py-4 text-right">Options</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 bg-white">
+              <tbody className="bg-transparent">
                 {currentUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50/50 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs border border-blue-100/50 shadow-sm">
+                  <tr key={user.id} className="bg-white hover:bg-slate-50/80 transition-all group">
+                    <td className="px-6 py-5 rounded-l-[1.5rem] border-y border-l border-slate-50">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/5 text-primary flex items-center justify-center font-black text-xs border border-primary/10 shadow-sm transition-transform group-hover:scale-105">
                           {user.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()}
                         </div>
-                        <div>
-                          <p className="font-bold text-slate-900 text-sm">{user.name}</p>
-                          <p className="text-xs text-slate-500 font-medium">{user.email}</p>
+                        <div className="min-w-0">
+                          <p className="font-black text-slate-900 text-sm tracking-tight truncate">{user.name}</p>
+                          <p className="text-xs text-slate-400 font-medium truncate tracking-tight">{user.email}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-semibold text-slate-700">{user.phone}</p>
-                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">Direct Line</p>
+                    <td className="px-6 py-5 border-y border-slate-50">
+                      <p className="text-sm font-black text-slate-700 tracking-tighter">{user.phone}</p>
+                      <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1">Verified Line</p>
                     </td>
-                    <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-slate-600">{user.joined}</p>
+                    <td className="px-6 py-5 border-y border-slate-50">
+                      <p className="text-sm font-bold text-slate-500 tracking-tight">{user.joined}</p>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-5 text-right rounded-r-[1.5rem] border-y border-r border-slate-50">
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="text-slate-300 hover:text-red-600 hover:bg-red-50 transition-all rounded-xl"
+                        className="text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all rounded-xl h-9 w-9"
                         onClick={() => deleteUser(user.id, user.name)}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -202,13 +193,10 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
         )}
       </div>
 
-      {/* --- PAGINATION FOOTER --- */}
       {!loading && filteredUsers.length > 0 && (
-        <div className="flex items-center justify-between px-8 py-5 bg-white border-t border-slate-50">
-          <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">
-            Showing <span className="text-slate-900">{indexOfFirstItem + 1}</span> to{" "}
-            <span className="text-slate-900">{Math.min(indexOfLastItem, filteredUsers.length)}</span> of{" "}
-            <span className="text-slate-900">{filteredUsers.length}</span>
+        <div className="flex items-center justify-between px-10 py-8 bg-white border-t border-slate-50 rounded-b-[2rem]">
+          <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">
+            Displaying <span className="text-primary">{indexOfFirstItem + 1}</span> — <span className="text-primary">{Math.min(indexOfLastItem, filteredUsers.length)}</span> of <span className="text-slate-900">{filteredUsers.length}</span>
           </p>
 
           <div className="flex items-center gap-2">
@@ -217,7 +205,7 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
               size="icon"
               onClick={() => setCurrentPage(1)}
               disabled={currentPage === 1}
-              className="h-8 w-8 rounded-xl border-slate-100 text-slate-400 hover:text-primary"
+              className="h-9 w-9 rounded-xl border-slate-100 text-slate-400 hover:text-primary transition-all"
             >
               <ChevronsLeft className="w-4 h-4" />
             </Button>
@@ -226,15 +214,15 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
               size="icon"
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="h-8 w-8 rounded-xl border-slate-100 text-slate-400 hover:text-primary"
+              className="h-9 w-9 rounded-xl border-slate-100 text-slate-400 hover:text-primary transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
 
-            <div className="flex items-center gap-1.5 px-4 h-8 bg-slate-50 rounded-xl border border-slate-100/50">
+            <div className="flex items-center gap-2 px-5 h-9 bg-slate-50 rounded-xl border border-slate-100/50">
               <span className="text-[11px] font-black text-primary">{currentPage}</span>
-              <span className="text-[11px] font-bold text-slate-300">/</span>
-              <span className="text-[11px] font-bold text-slate-500">{totalPages}</span>
+              <span className="text-[11px] font-black text-slate-300">/</span>
+              <span className="text-[11px] font-black text-slate-400">{totalPages}</span>
             </div>
 
             <Button
@@ -242,7 +230,7 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
               size="icon"
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 rounded-xl border-slate-100 text-slate-400 hover:text-primary"
+              className="h-9 w-9 rounded-xl border-slate-100 text-slate-400 hover:text-primary transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -251,7 +239,7 @@ export default function UsersTab({ onUpdateStats }: { onUpdateStats?: () => void
               size="icon"
               onClick={() => setCurrentPage(totalPages)}
               disabled={currentPage === totalPages}
-              className="h-8 w-8 rounded-xl border-slate-100 text-slate-400 hover:text-primary"
+              className="h-9 w-9 rounded-xl border-slate-100 text-slate-400 hover:text-primary transition-all"
             >
               <ChevronsRight className="w-4 h-4" />
             </Button>
