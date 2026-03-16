@@ -104,9 +104,7 @@ export default function Contacts() {
                       <span>{contact.location}</span>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm" className="w-full mt-4 rounded-lg">
-                    Send Message
-                  </Button>
+                  
                 </CardContent>
               </Card>
             ))}

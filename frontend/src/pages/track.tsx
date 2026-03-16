@@ -67,7 +67,7 @@ function TrackingMap({ route, currentStop, center, zoom, isSearching }: {
   const routePositions = route.map(p => p.pos);
   const activeStop = currentStop ?? route.length - 2;
   return (
-    <div className="rounded-2xl overflow-hidden border border-border/50" style={{ height: 380 }}>
+    <div className="rounded-2xl overflow-hidden border border-border/50 relative z-0" style={{ height: 380 }}>
       <MapContainer center={center} zoom={zoom} style={{ height: "100%", width: "100%" }} zoomControl={true} scrollWheelZoom={false}>
         <MapRecenter center={center} zoom={zoom} />
         <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
