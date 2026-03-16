@@ -211,7 +211,7 @@ export default function SignIn() {
                   </label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input type="number" value={form.phone} onChange={set("phone")} placeholder="+91 98201 45678" className="pl-9 h-11" />
+                    <Input type="tel" maxLength={10} pattern="[0-9]*" value={form.phone} onChange={set("phone")} placeholder="+91 98201 45678" className="pl-9 h-11" />
                   </div>
                 </div>
               )}
