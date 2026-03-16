@@ -19,7 +19,11 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // Add BOTH your local and live Netlify URLs here
+    'allowed_origins' => [
+        'http://localhost:5173',
+        'https://rapidroutee.netlify.app'
+    ],
 
     'allowed_origins_patterns' => [],
 
@@ -28,8 +32,6 @@ return [
     'exposed_headers' => [],
 
     'max_age' => 0,
-
-    'allowed_origins' => ['http://localhost:5173'],
 
     'supports_credentials' => true,
 
