@@ -215,7 +215,7 @@ export default function DriverDashboard() {
                             variant="outline" 
                             className="rounded-2xl h-12 font-bold border-slate-200 bg-white text-slate-700 hover:bg-slate-50 gap-2 shadow-sm"
                             // 👇 FIXED MAPS LINK 👇
-                            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcel.delivery_location)}`)}
+                            onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(parcel.delivery_location)}`, '_blank')}
                           >
                             <Navigation className="w-4 h-4 text-blue-500" /> Maps
                           </Button>
