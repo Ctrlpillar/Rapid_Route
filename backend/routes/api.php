@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/user/update', [UserController::class, 'update']);
     Route::post('/user/update-password', [UserController::class, 'updatePassword']);
+    Route::post('/user/avatar', [\App\Http\Controllers\Api\AuthController::class, 'uploadAvatar']);
 
     // Account Security
     Route::post('/logout', [AuthController::class, 'logout']);

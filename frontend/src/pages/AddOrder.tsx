@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PlusCircle, UploadCloud, CheckCircle2, X, FileText, Loader2, Phone, Mail, MapPin, Truck, Package } from "lucide-react";
+import { PlusCircle, UploadCloud, FileText, Loader2, Phone, Mail, MapPin, Truck, Package, Scale } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,6 +29,7 @@ const getTruckForPin = (pin: string) => {
 const EMPTY_FORM = { 
   trackingNumber: "", 
   itemName: "", 
+  weight: 10, // Default 10g
   customerName: "", 
   customerEmail: "", 
   customerPhone: "",
@@ -52,15 +53,24 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
     }
   }, [form.zipcode]);
 
+  // Logic to handle the display of weight (1000g -> 1kg)
+  const formatWeight = (grams: number) => {
+    if (grams >= 1000) {
+      const kg = grams / 1000;
+      return kg % 1 === 0 ? `${kg}kg` : `${kg.toFixed(1)}kg`;
+    }
+    return `${grams}g`;
+  };
+
   const syncToNeon = async (orders: any[]) => {
     setLoading(true);
     try {
       const dbPayload = orders.map(o => ({
         tracking_number: o.trackingNumber,
         item_name: o.itemName, 
+        weight: o.weight, // Send the raw numeric grams to DB
         customer_name: o.customerName,
         customer_email: o.customerEmail,
-        // 👇 FIX: Use o.customerPhone (camelCase) to grab the React state 👇
         customer_phone: o.customerPhone, 
         delivery_location: o.deliveryLocation,
         zipcode: o.zipcode, 
@@ -87,7 +97,6 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
     e.preventDefault();
     const errs: Record<string, string> = {};
 
-    // --- UPDATED STRICT VALIDATION: Check every field ---
     if (!form.trackingNumber.trim()) errs.trackingNumber = "Required";
     if (!form.itemName.trim()) errs.itemName = "Required"; 
     if (!form.customerName.trim()) errs.customerName = "Required";
@@ -163,61 +172,90 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
         <Card className="border-border/60 shadow-sm overflow-hidden">
           <CardHeader className="pt-8 px-8 pb-2">
             <CardTitle className="text-xl font-bold">Logistics Entry</CardTitle>
-            <p className="text-sm text-muted-foreground font-medium">Add a new shipment to the tracking network.</p>
+            <p className="text-sm text-muted-foreground font-medium">Add a new shipment to the network.</p>
           </CardHeader>
           <CardContent className="px-8 pb-8">
             <form onSubmit={handleSingleSubmit} className="space-y-6 mt-4">
               
-              <div className="grid sm:grid-cols-[1fr_2fr] gap-6">
+              <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Tracking ID *</label>
-                  <Input value={form.trackingNumber} onChange={e => setForm({...form, trackingNumber: e.target.value})} placeholder="RR-GOA-2026" className={errors.trackingNumber ? "border-red-400 focus-visible:ring-red-100" : "bg-slate-50/50"} />
+                  <Input value={form.trackingNumber} onChange={e => setForm({...form, trackingNumber: e.target.value})} placeholder="RR-GOA-2026" className={errors.trackingNumber ? "border-red-400" : "bg-slate-50/50"} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Item / Product Name *</label>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Item Name *</label>
                   <div className="relative">
                     <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input value={form.itemName} onChange={e => setForm({...form, itemName: e.target.value})} placeholder="e.g. Nike Running Shoes" className={`pl-10 bg-slate-50/50 ${errors.itemName ? "border-red-400 focus-visible:ring-red-100" : ""}`} />
+                    <Input value={form.itemName} onChange={e => setForm({...form, itemName: e.target.value})} placeholder="e.g. Nike Shoes" className={`pl-10 bg-slate-50/50 ${errors.itemName ? "border-red-400" : ""}`} />
                   </div>
+                </div>
+              </div>
+
+              {/* --- NEW: PACKAGE WEIGHT SLIDER --- */}
+              <div className="space-y-4 bg-blue-50/30 p-5 rounded-2xl border border-blue-100/50">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <Scale className="w-4 h-4 text-primary" />
+                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">
+                      Package Weight
+                    </label>
+                  </div>
+                  <span className="text-sm font-black text-white bg-primary px-3 py-1 rounded-lg shadow-md shadow-primary/20">
+                    {formatWeight(form.weight)}
+                  </span>
+                </div>
+                
+                <input 
+                  type="range"
+                  min="10"
+                  max="2000"
+                  step="10"
+                  value={form.weight}
+                  onChange={(e) => setForm({ ...form, weight: parseInt(e.target.value) })}
+                  className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                
+                <div className="flex justify-between text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                  <span>10g</span>
+                  <span>1kg</span>
+                  <span>2kg</span>
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Recipient Full Name *</label>
-                  <Input value={form.customerName} onChange={e => setForm({...form, customerName: e.target.value})} placeholder="e.g. Arjun Sharma" className={errors.customerName ? "border-red-400 focus-visible:ring-red-100" : "bg-slate-50/50"} />
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Recipient Name *</label>
+                  <Input value={form.customerName} onChange={e => setForm({...form, customerName: e.target.value})} placeholder="e.g. Arjun Sharma" className={errors.customerName ? "border-red-400" : "bg-slate-50/50"} />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Assigned Route (Truck)</label>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Assigned Truck</label>
                   <div className="relative">
                     <Truck className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <select 
                       value={form.carrier} 
                       onChange={e => setForm({...form, carrier: e.target.value})} 
-                      className="w-full h-10 bg-slate-50/50 border rounded-md pl-10 pr-3 text-sm focus:ring-2 focus:ring-primary border-input appearance-none font-semibold text-primary"
+                      className="w-full h-10 bg-slate-50/50 border rounded-md pl-10 pr-3 text-sm focus:ring-2 focus:ring-primary border-input font-semibold text-primary"
                     >
                       {TRUCK_NAMES.map(t => <option key={t} value={t}>{t}</option>)}
                       <option value={FALLBACK_TRUCK}>{FALLBACK_TRUCK}</option>
                     </select>
                   </div>
-                  <p className="text-[10px] text-slate-400 font-medium">* Auto-assigned based on PIN code</p>
                 </div>
               </div>
 
-              {/* ROW 3: Phone & Email - Now with required visual cues */}
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Phone Number *</label>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Phone *</label>
                   <div className="relative">
                     <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input value={form.customerPhone} onChange={e => setForm({...form, customerPhone: e.target.value})} placeholder="+91 982xx xxxxx" className={`pl-10 bg-slate-50/50 ${errors.customerPhone ? "border-red-400 focus-visible:ring-red-100" : ""}`} />
+                    <Input value={form.customerPhone} onChange={e => setForm({...form, customerPhone: e.target.value})} placeholder="+91 98xxx xxxxx" className={`pl-10 bg-slate-50/50 ${errors.customerPhone ? "border-red-400" : ""}`} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Email Address *</label>
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Email *</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input type="email" value={form.customerEmail} onChange={e => setForm({...form, customerEmail: e.target.value})} placeholder="arjun@example.com" className={`pl-10 bg-slate-50/50 ${errors.customerEmail ? "border-red-400 focus-visible:ring-red-100" : ""}`} />
+                    <Input type="email" value={form.customerEmail} onChange={e => setForm({...form, customerEmail: e.target.value})} placeholder="arjun@example.com" className={`pl-10 bg-slate-50/50 ${errors.customerEmail ? "border-red-400" : ""}`} />
                   </div>
                 </div>
               </div>
@@ -227,16 +265,16 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-500">PIN Code *</label>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <Input value={form.zipcode} onChange={e => setForm({...form, zipcode: e.target.value})} placeholder="403001" maxLength={6} className={`pl-10 bg-slate-50/50 font-mono tracking-widest ${errors.zipcode ? "border-red-400 focus-visible:ring-red-100" : ""}`} />
+                    <Input value={form.zipcode} onChange={e => setForm({...form, zipcode: e.target.value})} placeholder="403001" maxLength={6} className={`pl-10 bg-slate-50/50 font-mono ${errors.zipcode ? "border-red-400" : ""}`} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Delivery Address *</label>
-                  <Input value={form.deliveryLocation} onChange={e => setForm({...form, deliveryLocation: e.target.value})} placeholder="Flat No, Building, Area, City, Goa" className={errors.deliveryLocation ? "border-red-400 focus-visible:ring-red-100" : "bg-slate-50/50"} />
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Address *</label>
+                  <Input value={form.deliveryLocation} onChange={e => setForm({...form, deliveryLocation: e.target.value})} placeholder="City, Area, Goa" className={errors.deliveryLocation ? "border-red-400" : "bg-slate-50/50"} />
                 </div>
               </div>
 
-              <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-bold shadow-lg shadow-primary/20 transition-all hover:scale-[1.01]">
+              <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl text-base font-bold shadow-lg transition-all hover:scale-[1.01]">
                 {loading ? <Loader2 className="animate-spin mr-2" /> : <PlusCircle className="w-5 h-5 mr-2" />}
                 Register Shipment
               </Button>
@@ -251,21 +289,17 @@ export default function AddOrder({ onAddOrders, onViewOrders }: { onAddOrders: (
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-5 border border-primary/20">
               <UploadCloud className="w-10 h-10 text-primary" />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">Upload Order Dataset</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">Upload Dataset</h3>
             <p className="text-sm text-slate-500 max-w-md mb-8 leading-relaxed">
-              Upload a .csv file from your eCommerce client. The system will safely map columns based on headers like <b>item_name</b>, <b>tracking_number</b>, <b>delivery_location</b>, and <b>carrier</b>.
+              Upload your .csv file. The system expects headers like <b>item_name</b>, <b>weight</b>, and <b>tracking_number</b>.
             </p>
             <input 
-              type="file" 
-              accept=".csv" 
-              id="csv-upload" 
-              className="hidden" 
-              onChange={handleBulkUpload}
-              disabled={loading}
+              type="file" accept=".csv" id="csv-upload" className="hidden" 
+              onChange={handleBulkUpload} disabled={loading}
             />
             <label 
               htmlFor="csv-upload" 
-              className={`bg-primary text-white px-8 py-3.5 rounded-xl font-bold cursor-pointer hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center gap-2 ${loading ? 'opacity-50 pointer-events-none' : ''}`}
+              className={`bg-primary text-white px-8 py-3.5 rounded-xl font-bold cursor-pointer hover:bg-primary/90 transition-all shadow-lg flex items-center gap-2 ${loading ? 'opacity-50 pointer-events-none' : ''}`}
             >
               {loading ? <Loader2 className="animate-spin w-5 h-5" /> : <FileText className="w-5 h-5" />}
               {loading ? "Syncing..." : "Select CSV File"}

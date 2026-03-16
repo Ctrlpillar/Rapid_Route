@@ -24,8 +24,8 @@ zipcodes = ["403001", "403507", "403701", "403802", "403401"]
 # Generate
 with open(filename, mode='w', newline='') as file:
     writer = csv.writer(file)
-    # Headers exactly as Laravel expects
-    writer.writerow(["tracking_number", "item_name", "customer_name", "customer_email", "customer_phone", "zipcode", "delivery_location", "carrier"])
+    # Headers exactly as Laravel expects (Added 'weight')
+    writer.writerow(["tracking_number", "item_name", "weight", "customer_name", "customer_email", "customer_phone", "zipcode", "delivery_location", "carrier"])
     
     for i in range(1, num_records + 1):
         f_name = random.choice(first_names)
@@ -35,12 +35,16 @@ with open(filename, mode='w', newline='') as file:
         tracking = f"RR-{random.randint(100, 999)}-{random.randint(100, 999)}-{i:03d}"
         phone = f"+919{random.randint(100000000, 999999999)}"
         
+        # Random weight between 10g and 2000g
+        weight = random.randint(10, 2000)
+        
         # Pick a random route and its matching zipcode
         route_idx = random.randint(0, 4)
         
         writer.writerow([
             tracking,
             random.choice(items),
+            weight,  # New Column
             full_name,
             email,
             phone,
@@ -49,4 +53,4 @@ with open(filename, mode='w', newline='') as file:
             routes[route_idx]
         ])
 
-print(f"Successfully generated {filename} with {num_records} orders!")
+print(f"Successfully generated {filename} with {num_records} orders (including random weights)!")

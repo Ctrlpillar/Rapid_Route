@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button"; // Added Button import
+import { Button } from "@/components/ui/button";
 import { 
   Trash2, ChevronDown, ChevronUp, Lock, Search, Package, 
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight 
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Filter
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { AdminOrder, OrderStatus } from "./admin";
@@ -33,7 +33,12 @@ const STATUS_LABELS: Record<string, string> = {
   out_for_delivery: "Out for Delivery",
 };
 
-function StatusDropdown({ value, onChange, disabled }: { value: OrderStatus; onChange: (v: OrderStatus) => void; disabled?: boolean }) {
+function StatusDropdown({ value, onChange, disabled, position = "down" }: { 
+  value: OrderStatus; 
+  onChange: (v: OrderStatus) => void; 
+  disabled?: boolean;
+  position?: "up" | "down";
+}) {
   const [open, setOpen] = useState(false);
   
   return (
@@ -53,10 +58,11 @@ function StatusDropdown({ value, onChange, disabled }: { value: OrderStatus; onC
           <>
             <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
             <motion.div 
-              initial={{ opacity: 0, y: -4, scale: 0.95 }} 
+              initial={{ opacity: 0, y: position === "down" ? -4 : 4, scale: 0.95 }} 
               animate={{ opacity: 1, y: 0, scale: 1 }} 
               exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute left-1/2 -translate-x-1/2 top-full mt-3 z-[100] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden min-w-[180px] p-2"
+              className={`absolute left-1/2 -translate-x-1/2 z-[100] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden min-w-[180px] p-2
+                ${position === "down" ? "top-full mt-3" : "bottom-full mb-3"}`}
             >
               {ORDER_STATUSES.map(s => (
                 <button 
@@ -86,15 +92,21 @@ export default function OrdersTab({
   onDeleteClick: (id: string, trackingNumber: string) => void;
 }) {
   const [orderSearch, setOrderSearch] = useState("");
+  // --- NEW: STATE FOR STATUS FILTER ---
+  const [statusFilter, setStatusFilter] = useState("all");
   
   // --- PAGINATION STATE ---
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const filteredOrders = orders.filter(o => 
-    o.trackingNumber.toLowerCase().includes(orderSearch.toLowerCase()) || 
-    o.customerName.toLowerCase().includes(orderSearch.toLowerCase())
-  );
+  // --- UPDATED: FILTER LOGIC (Checks both Search AND Status) ---
+  const filteredOrders = orders.filter(o => {
+    const matchesSearch = o.trackingNumber.toLowerCase().includes(orderSearch.toLowerCase()) || 
+                          o.customerName.toLowerCase().includes(orderSearch.toLowerCase());
+    const matchesStatus = statusFilter === "all" || o.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  });
 
   // Pagination Logic
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
@@ -102,10 +114,10 @@ export default function OrdersTab({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Reset to first page when search changes
+  // --- UPDATED: Reset to page 1 when ANY filter changes ---
   useEffect(() => {
     setCurrentPage(1);
-  }, [orderSearch]);
+  }, [orderSearch, statusFilter]);
 
   // --- PHYSICAL ARROW KEY NAVIGATION ---
   useEffect(() => {
@@ -119,22 +131,46 @@ export default function OrdersTab({
 
   return (
     <Card className="border-none shadow-sm rounded-[2.5rem] bg-white overflow-hidden flex flex-col">
-      <div className="p-8 border-b border-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input 
-            value={orderSearch} 
-            onChange={e => setOrderSearch(e.target.value)} 
-            placeholder="Search tracking or customer..." 
-            className="pl-12 h-12 bg-slate-50 border-none rounded-2xl focus-visible:ring-primary/20 font-medium" 
-          />
+      <div className="p-8 border-b border-slate-50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        
+        {/* --- NEW: COMBINED SEARCH & FILTER WRAPPER --- */}
+        <div className="flex flex-col sm:flex-row w-full lg:max-w-2xl gap-3">
+          {/* Text Search */}
+          <div className="relative w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Input 
+              value={orderSearch} 
+              onChange={e => setOrderSearch(e.target.value)} 
+              placeholder="Search tracking or customer..." 
+              className="pl-12 h-12 bg-slate-50 border-none rounded-2xl focus-visible:ring-primary/20 font-medium" 
+            />
+          </div>
+
+          {/* Status Dropdown */}
+          <div className="relative w-full sm:w-48 flex-shrink-0">
+            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full h-12 pl-11 pr-10 bg-slate-50 border-none rounded-2xl focus-visible:ring-primary/20 font-bold text-sm text-slate-600 appearance-none cursor-pointer outline-none"
+            >
+              <option value="all">All Statuses</option>
+              {ORDER_STATUSES.map(status => (
+                <option key={status.value} value={status.value}>
+                  {status.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
         </div>
-        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-4 py-2 rounded-xl">
-          {filteredOrders.length} Shipments In Network
+
+        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 px-4 py-2 rounded-xl whitespace-nowrap">
+          {filteredOrders.length} Shipments found
         </div>
       </div>
 
-      <div className="overflow-x-visible flex-1">
+      <div className="overflow-x-visible flex-1 pb-4">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50 text-[10px] uppercase tracking-widest font-black text-slate-400">
@@ -153,8 +189,10 @@ export default function OrdersTab({
                 </td>
               </tr>
             ) : (
-              currentOrders.map(o => {
+              currentOrders.map((o, index) => {
                 const isFinalStatus = o.status === "delivered" || o.status === "cancelled";
+                
+                const dropdownPosition = (index >= currentOrders.length - 2 && currentOrders.length > 2) ? "up" : "down";
                 
                 return (
                   <tr key={o.id} className="hover:bg-slate-50/30 transition-all duration-200 group">
@@ -162,9 +200,18 @@ export default function OrdersTab({
                       <p className="font-mono text-xs font-black text-blue-600 tracking-tighter uppercase">
                         {o.trackingNumber}
                       </p>
-                      <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">
-                        {o.orderName || "Standard Parcel"}
-                      </p>
+                      
+                      <div className="flex items-center gap-2 mt-1">
+                        <p className="text-[10px] text-slate-400 font-bold uppercase">
+                          {o.orderName || "Standard Parcel"}
+                        </p>
+                        {o.formatted_weight && (
+                          <span className="bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded flex items-center text-[9px] font-bold">
+                            {o.formatted_weight}
+                          </span>
+                        )}
+                      </div>
+
                     </td>
                     <td className="px-8 py-6">
                       <div className="flex flex-col justify-center">
@@ -180,7 +227,8 @@ export default function OrdersTab({
                       <StatusDropdown 
                         value={o.status} 
                         onChange={v => onUpdateStatus(o.id, v)}
-                        disabled={isFinalStatus} 
+                        disabled={isFinalStatus}
+                        position={dropdownPosition}
                       />
                     </td>
                     <td className="px-8 py-6 text-right">

@@ -10,6 +10,44 @@ import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 
+// --- 1. PRIORITY SORTING LOGIC ---
+// This ensures drivers see the most urgent tasks at the top of their screen
+const STATUS_PRIORITY: Record<string, number> = {
+  out_for_delivery: 1,
+  in_transit: 2,
+  approved: 3,
+  pending: 4,
+};
+
+// --- 2. PROGRESSIVE STATE MACHINE ---
+// Dictates what the button looks like and what it does next
+const getActionConfig = (status: string) => {
+  switch (status) {
+    case 'pending': 
+      return { text: "Awaiting Admin", color: "bg-slate-100 text-slate-400 shadow-none", next: null, disabled: true, Icon: Clock };
+    case 'approved': 
+      return { text: "Start Transit", color: "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20", next: "in_transit", disabled: false, Icon: Truck };
+    case 'in_transit': 
+      return { text: "Out for Delivery", color: "bg-violet-600 hover:bg-violet-700 text-white shadow-violet-600/20", next: "out_for_delivery", disabled: false, Icon: MapPin };
+    case 'out_for_delivery': 
+      return { text: "Mark Delivered", color: "bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/20", next: "delivered", disabled: false, Icon: CheckCircle };
+    default: 
+      return { text: "Completed", color: "bg-slate-200 text-slate-400 shadow-none", next: null, disabled: true, Icon: CheckCircle };
+  }
+};
+
+// --- 3. DYNAMIC STATUS STYLES ---
+// Colors the side-bar and the status pill
+const getStatusStyles = (status: string) => {
+  switch (status) {
+    case 'pending': return { bar: 'bg-amber-400', pill: 'bg-amber-100 text-amber-700' };
+    case 'approved': return { bar: 'bg-blue-500', pill: 'bg-blue-100 text-blue-700' };
+    case 'in_transit': return { bar: 'bg-violet-500', pill: 'bg-violet-100 text-violet-700' };
+    case 'out_for_delivery': return { bar: 'bg-purple-500', pill: 'bg-purple-100 text-purple-700' };
+    default: return { bar: 'bg-slate-300', pill: 'bg-slate-100 text-slate-600' };
+  }
+};
+
 export default function DriverDashboard() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -43,14 +81,23 @@ export default function DriverDashboard() {
 
   const handleUpdateStatus = async (id: number, newStatus: string, customerName: string) => {
     try {
+      // Optimistic UI Update: Makes the button feel instantly responsive
+      setParcels(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
+      
       await axios.patch(`http://localhost:8000/api/driver/update-status/${id}`, 
         { status: newStatus },
         { headers: { Authorization: `Bearer ${localStorage.getItem("driver_token")}` }}
       );
       
-      toast({ title: "Status Updated", description: `${customerName} is now ${newStatus.replace('_', ' ')}.` });
-      fetchManifest();
+      toast({ title: "Status Updated", description: `${customerName}'s package is now ${newStatus.replace(/_/g, ' ')}.` });
+      
+      // If it's delivered, wait a brief moment then fetch to remove it from the list smoothly
+      if (newStatus === 'delivered') {
+        setTimeout(() => fetchManifest(), 1000);
+      }
     } catch (e) {
+      // Revert if API fails
+      fetchManifest();
       toast({ variant: "destructive", title: "Update Failed", description: "Check your connection and try again." });
     }
   };
@@ -62,10 +109,17 @@ export default function DriverDashboard() {
     navigate("/driver-login"); 
   };
 
-  const filteredParcels = parcels.filter(p => 
-    p.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    p.tracking_number.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter and SORT the parcels by urgency
+  const sortedAndFilteredParcels = parcels
+    .filter(p => 
+      p.customer_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      p.tracking_number.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      const pA = STATUS_PRIORITY[a.status] || 99;
+      const pB = STATUS_PRIORITY[b.status] || 99;
+      return pA - pB;
+    });
 
   return (
     <div className="min-h-screen bg-slate-50 pb-24 text-slate-900 font-sans">
@@ -98,18 +152,18 @@ export default function DriverDashboard() {
       </div>
 
       <div className="max-w-md mx-auto px-4 mt-6 space-y-4">
-        {loading ? (
+        {loading && parcels.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-slate-400">
             <RefreshCw className="w-8 h-8 animate-spin mb-3 text-primary" />
             <p className="text-sm font-medium text-slate-500">Syncing live manifest...</p>
           </div>
-        ) : parcels.length === 0 ? (
+        ) : sortedAndFilteredParcels.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl border-2 border-dashed border-slate-200 shadow-sm">
             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
               <Package className="w-10 h-10 text-slate-300" />
             </div>
             <h3 className="font-bold text-lg text-slate-900">Route Clear!</h3>
-            <p className="text-sm text-slate-500 mt-1">All assigned parcels have been delivered.</p>
+            <p className="text-sm text-slate-500 mt-1">All assigned parcels have been processed.</p>
             <Button variant="outline" className="mt-6 rounded-xl border-slate-200 text-slate-700 hover:bg-slate-50 font-bold" onClick={fetchManifest}>
               <RefreshCw className="w-4 h-4 mr-2 text-primary" /> Refresh Manifest
             </Button>
@@ -117,86 +171,87 @@ export default function DriverDashboard() {
         ) : (
           <>
             <div className="flex items-center justify-between px-2">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{filteredParcels.length} Active Stops</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{sortedAndFilteredParcels.length} Active Stops</span>
               <span className="text-[10px] font-bold text-primary flex items-center gap-1 uppercase"><Clock className="w-3 h-3" /> Live Sync</span>
             </div>
 
-            {filteredParcels.map((parcel) => (
-              <Card key={parcel.id} className="border-none shadow-sm rounded-3xl bg-white overflow-hidden active:scale-[0.98] transition-all">
-                <CardContent className="p-0">
-                  <div className="flex items-stretch min-h-[140px]">
-                    {/* Status Bar Indicator */}
-                    <div className={`w-1.5 ${parcel.status === 'out_for_delivery' ? 'bg-purple-500' : 'bg-blue-500'}`} />
-                    
-                    <div className="flex-1 p-5 flex flex-col justify-between">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-tighter">{parcel.tracking_number}</p>
-                          <h3 className="font-bold text-lg text-slate-900 leading-tight">{parcel.customer_name}</h3>
-                          {/* Item name removed as requested */}
-                        </div>
-                        
-                        <div className="flex flex-col items-end gap-1.5">
-                          <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider ${parcel.status === 'out_for_delivery' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {parcel.status.replace('_', ' ')}
-                          </span>
-                          {parcel.customer_phone && (
-                            <a 
-                              href={`tel:${parcel.customer_phone}`} 
-                              className="flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-primary transition-colors bg-slate-50 px-2 py-1 rounded-md border border-slate-100"
-                            >
-                              <Phone className="w-3 h-3" /> {parcel.customer_phone}
-                            </a>
-                          )}
-                        </div>
-                      </div>
+            {sortedAndFilteredParcels.map((parcel) => {
+              // Get dynamic configurations for this specific parcel
+              const action = getActionConfig(parcel.status);
+              const styles = getStatusStyles(parcel.status);
+              const ActionIcon = action.Icon;
 
-                      {/* Location Display */}
-                      <div className="flex items-start gap-2 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                        <MapPin className="w-4 h-4 mt-0.5 text-slate-400 flex-shrink-0" />
-                        <p className="text-xs font-medium text-slate-600 line-clamp-2 leading-relaxed">
-                          {parcel.delivery_location}
-                        </p>
-                      </div>
+              return (
+                <Card key={parcel.id} className="border-none shadow-sm rounded-3xl bg-white overflow-hidden active:scale-[0.98] transition-all">
+                  <CardContent className="p-0">
+                    <div className="flex items-stretch min-h-[140px]">
+                      {/* Dynamic Status Bar Indicator */}
+                      <div className={`w-1.5 transition-colors duration-300 ${styles.bar}`} />
+                      
+                      <div className="flex-1 p-5 flex flex-col justify-between">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <p className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-tighter">{parcel.tracking_number}</p>
+                            <h3 className="font-bold text-lg text-slate-900 leading-tight">{parcel.customer_name}</h3>
+                          </div>
+                          
+                          <div className="flex flex-col items-end gap-1.5">
+                            {/* Dynamic Status Pill */}
+                            <span className={`px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors duration-300 ${styles.pill}`}>
+                              {parcel.status.replace(/_/g, ' ')}
+                            </span>
+                            
+                            {parcel.customer_phone && (
+                              <a 
+                                href={`tel:${parcel.customer_phone}`} 
+                                className="flex items-center gap-1 text-[11px] font-bold text-slate-500 hover:text-primary transition-colors bg-slate-50 px-2 py-1 rounded-md border border-slate-100"
+                              >
+                                <Phone className="w-3 h-3" /> {parcel.customer_phone}
+                              </a>
+                            )}
+                          </div>
+                        </div>
 
-                      {/* Action Buttons */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <Button 
-                          variant="outline" 
-                          className="rounded-2xl h-12 font-bold border-slate-200 bg-white text-slate-700 hover:bg-slate-50 gap-2 shadow-sm"
-                          onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parcel.delivery_location)}`)}
-                        >
-                          <Navigation className="w-4 h-4 text-blue-500" /> Maps
-                        </Button>
-                        
-                        {parcel.status === 'in_transit' ? (
+                        {/* Location Display */}
+                        <div className="flex items-start gap-2 mb-4 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                          <MapPin className="w-4 h-4 mt-0.5 text-slate-400 flex-shrink-0" />
+                          <p className="text-xs font-medium text-slate-600 line-clamp-2 leading-relaxed">
+                            {parcel.delivery_location}
+                          </p>
+                        </div>
+
+                        {/* Action Buttons */}
+                        <div className="grid grid-cols-[1fr_2fr] gap-3">
                           <Button 
-                            className="rounded-2xl h-12 font-bold bg-primary hover:bg-primary/90 shadow-md shadow-primary/20 gap-2 text-white"
-                            onClick={() => handleUpdateStatus(parcel.id, 'out_for_delivery', parcel.customer_name)}
+                            variant="outline" 
+                            className="rounded-2xl h-12 font-bold border-slate-200 bg-white text-slate-700 hover:bg-slate-50 gap-2 shadow-sm"
+                            onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=$${encodeURIComponent(parcel.delivery_location)}`)}
                           >
-                            Out for Delivery
+                            <Navigation className="w-4 h-4 text-blue-500" /> Maps
                           </Button>
-                        ) : (
+                          
+                          {/* DYNAMIC PROGRESSIVE BUTTON */}
                           <Button 
-                            className="rounded-2xl h-12 font-bold bg-emerald-600 hover:bg-emerald-700 shadow-md shadow-emerald-600/20 gap-2 text-white"
-                            onClick={() => handleUpdateStatus(parcel.id, 'delivered', parcel.customer_name)}
+                            disabled={action.disabled}
+                            className={`rounded-2xl h-12 font-bold shadow-md gap-2 transition-all duration-300 ${action.color}`}
+                            onClick={() => action.next && handleUpdateStatus(parcel.id, action.next, parcel.customer_name)}
                           >
-                            <CheckCircle className="w-4 h-4" /> Delivered
+                            <ActionIcon className="w-4 h-4" /> {action.text}
                           </Button>
-                        )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </>
         )}
       </div>
 
       {/* Persistent Sync Button */}
       {!loading && parcels.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-md px-4 z-20">
           <Button 
             className="w-full h-14 rounded-2xl bg-white border border-slate-200 text-slate-900 font-bold shadow-2xl hover:bg-slate-50 transition-all flex items-center justify-between px-6"
             onClick={fetchManifest}

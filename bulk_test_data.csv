@@ -1,101 +1,101 @@
-tracking_number,item_name,customer_name,customer_email,customer_phone,zipcode,delivery_location,carrier
-RR-274-371-001,Football Boots,Priya D'Souza,priya.d'souza1@example.com,+919983102067,403701,Old Goa,Truck 03 - Margao & South Coastal
-RR-369-328-002,Smart Watch,Sneha Fernandes,sneha.fernandes2@example.com,+919807273559,403507,Margao Market Area,Truck 02 - Mapusa & North Coastal
-RR-434-627-003,Bluetooth Speaker,Kevin Gupta,kevin.gupta3@example.com,+919221360333,403701,"Altinho, Panaji",Truck 03 - Margao & South Coastal
-RR-995-327-004,Wireless Headphones,Deepa D'Souza,deepa.d'souza4@example.com,+919560485306,403701,Ponda City Center,Truck 03 - Margao & South Coastal
-RR-650-304-005,Gaming Laptop,Kevin Fernandes,kevin.fernandes5@example.com,+919793049476,403802,Anjuna Beach Rd,Truck 04 - Vasco & Mormugao
-RR-336-434-006,Gaming Laptop,Kevin Kamat,kevin.kamat6@example.com,+919576476265,403701,"Altinho, Panaji",Truck 03 - Margao & South Coastal
-RR-392-855-007,Mechanical Keyboard,Sarah Kamat,sarah.kamat7@example.com,+919610415584,403401,Margao Market Area,Truck 05 - Ponda & Inland
-RR-714-318-008,Bluetooth Speaker,Anjali Naik,anjali.naik8@example.com,+919169585593,403001,"Baina, Vasco",Truck 01 - Panjim & Tiswadi
-RR-912-702-009,Running Shoes,Deepa Sinha,deepa.sinha9@example.com,+919933834936,403802,Colva Beach Rd,Truck 04 - Vasco & Mormugao
-RR-856-813-010,Coffee Machine,Anjali Gupta,anjali.gupta10@example.com,+919556533209,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
-RR-524-757-011,Football Boots,Priya Vaz,priya.vaz11@example.com,+919195902924,403802,Old Goa,Truck 04 - Vasco & Mormugao
-RR-306-883-012,Gaming Laptop,Anjali Pereira,anjali.pereira12@example.com,+919474794799,403401,Anjuna Beach Rd,Truck 05 - Ponda & Inland
-RR-755-543-013,Running Shoes,Sneha Naik,sneha.naik13@example.com,+919583343620,403802,Ponda City Center,Truck 04 - Vasco & Mormugao
-RR-867-982-014,Coffee Machine,Arjun Sinha,arjun.sinha14@example.com,+919730926923,403802,Mapusa Market,Truck 04 - Vasco & Mormugao
-RR-273-371-015,Gaming Laptop,Kevin Gupta,kevin.gupta15@example.com,+919531634878,403701,Mapusa Market,Truck 03 - Margao & South Coastal
-RR-244-448-016,Smart Watch,Anjali Fernandes,anjali.fernandes16@example.com,+919642610471,403701,Ponda City Center,Truck 03 - Margao & South Coastal
-RR-940-700-017,Gaming Laptop,Priya Sinha,priya.sinha17@example.com,+919660028281,403401,Mapusa Market,Truck 05 - Ponda & Inland
-RR-908-983-018,Smart Watch,Anjali Sharma,anjali.sharma18@example.com,+919666948984,403001,Candolim Main St,Truck 01 - Panjim & Tiswadi
-RR-903-951-019,Football Boots,Priya Kamat,priya.kamat19@example.com,+919983574139,403701,"Altinho, Panaji",Truck 03 - Margao & South Coastal
-RR-582-108-020,Gaming Laptop,Priya Naik,priya.naik20@example.com,+919377643844,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
-RR-989-479-021,Running Shoes,Rohan D'Souza,rohan.d'souza21@example.com,+919961824129,403507,Ponda City Center,Truck 02 - Mapusa & North Coastal
-RR-753-678-022,Gaming Laptop,Sarah Mendes,sarah.mendes22@example.com,+919576474822,403802,Mapusa Market,Truck 04 - Vasco & Mormugao
-RR-891-654-023,Smart Watch,Anjali Sharma,anjali.sharma23@example.com,+919434858229,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
-RR-498-335-024,Bluetooth Speaker,Sneha Naik,sneha.naik24@example.com,+919680231561,403802,Old Goa,Truck 04 - Vasco & Mormugao
-RR-136-674-025,Wireless Headphones,Euan Mendes,euan.mendes25@example.com,+919516531933,403701,Margao Market Area,Truck 03 - Margao & South Coastal
-RR-210-439-026,Tablet,Arjun Gupta,arjun.gupta26@example.com,+919494015392,403507,"Baina, Vasco",Truck 02 - Mapusa & North Coastal
-RR-250-288-027,Smart Watch,Deepa Fernandes,deepa.fernandes27@example.com,+919324092279,403802,Old Goa,Truck 04 - Vasco & Mormugao
-RR-779-155-028,Coffee Machine,Deepa Naik,deepa.naik28@example.com,+919408058928,403802,Margao Market Area,Truck 04 - Vasco & Mormugao
-RR-547-363-029,Mechanical Keyboard,Anjali Fernandes,anjali.fernandes29@example.com,+919217863192,403507,Candolim Main St,Truck 02 - Mapusa & North Coastal
-RR-644-836-030,Coffee Machine,Priya Naik,priya.naik30@example.com,+919354142368,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
-RR-567-804-031,Running Shoes,Anjali Gupta,anjali.gupta31@example.com,+919977515724,403701,Calangute,Truck 03 - Margao & South Coastal
-RR-432-439-032,Smartphone,Vikram D'Souza,vikram.d'souza32@example.com,+919756568254,403701,Candolim Main St,Truck 03 - Margao & South Coastal
-RR-517-343-033,Running Shoes,Sarah D'Souza,sarah.d'souza33@example.com,+919850448557,403507,Anjuna Beach Rd,Truck 02 - Mapusa & North Coastal
-RR-496-395-034,Coffee Machine,Priya Sharma,priya.sharma34@example.com,+919918571796,403802,"Altinho, Panaji",Truck 04 - Vasco & Mormugao
-RR-990-846-035,Gaming Laptop,Arjun Pereira,arjun.pereira35@example.com,+919939096834,403802,Ponda City Center,Truck 04 - Vasco & Mormugao
-RR-409-741-036,Bluetooth Speaker,Priya Sharma,priya.sharma36@example.com,+919776922048,403507,Colva Beach Rd,Truck 02 - Mapusa & North Coastal
-RR-798-406-037,Wireless Headphones,Euan Sharma,euan.sharma37@example.com,+919658608916,403507,"Altinho, Panaji",Truck 02 - Mapusa & North Coastal
-RR-761-445-038,Bluetooth Speaker,Vikram Kamat,vikram.kamat38@example.com,+919968125092,403507,Calangute,Truck 02 - Mapusa & North Coastal
-RR-188-318-039,Tablet,Deepa Gupta,deepa.gupta39@example.com,+919183300760,403802,Anjuna Beach Rd,Truck 04 - Vasco & Mormugao
-RR-969-506-040,Running Shoes,Anjali Fernandes,anjali.fernandes40@example.com,+919569861122,403507,"Altinho, Panaji",Truck 02 - Mapusa & North Coastal
-RR-805-520-041,Mechanical Keyboard,Vikram Sinha,vikram.sinha41@example.com,+919531745760,403701,Candolim Main St,Truck 03 - Margao & South Coastal
-RR-150-415-042,Smart Watch,Vikram Naik,vikram.naik42@example.com,+919645075544,403001,Colva Beach Rd,Truck 01 - Panjim & Tiswadi
-RR-554-762-043,Wireless Headphones,Sarah Gupta,sarah.gupta43@example.com,+919530108491,403802,"Baina, Vasco",Truck 04 - Vasco & Mormugao
-RR-223-900-044,Mechanical Keyboard,Sneha Sharma,sneha.sharma44@example.com,+919808504101,403701,Margao Market Area,Truck 03 - Margao & South Coastal
-RR-914-358-045,Smartphone,Deepa Naik,deepa.naik45@example.com,+919666864129,403401,Calangute,Truck 05 - Ponda & Inland
-RR-296-759-046,Bluetooth Speaker,Sarah Vaz,sarah.vaz46@example.com,+919399244730,403701,Old Goa,Truck 03 - Margao & South Coastal
-RR-317-716-047,Bluetooth Speaker,Priya Gupta,priya.gupta47@example.com,+919824590066,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
-RR-938-138-048,Coffee Machine,Rohan Gupta,rohan.gupta48@example.com,+919586707638,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
-RR-134-145-049,Football Boots,Sarah Vaz,sarah.vaz49@example.com,+919180780929,403507,Ponda City Center,Truck 02 - Mapusa & North Coastal
-RR-142-536-050,Running Shoes,Deepa Gupta,deepa.gupta50@example.com,+919162835976,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
-RR-278-720-051,Football Boots,Sneha Naik,sneha.naik51@example.com,+919407964615,403401,Candolim Main St,Truck 05 - Ponda & Inland
-RR-256-522-052,Mechanical Keyboard,Arjun Sinha,arjun.sinha52@example.com,+919595259095,403802,Candolim Main St,Truck 04 - Vasco & Mormugao
-RR-470-172-053,Tablet,Sarah Naik,sarah.naik53@example.com,+919414553188,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
-RR-936-927-054,Bluetooth Speaker,Sneha Kamat,sneha.kamat54@example.com,+919721596739,403802,Colva Beach Rd,Truck 04 - Vasco & Mormugao
-RR-273-992-055,Mechanical Keyboard,Deepa Naik,deepa.naik55@example.com,+919968254689,403802,Anjuna Beach Rd,Truck 04 - Vasco & Mormugao
-RR-104-725-056,Tablet,Kevin Sharma,kevin.sharma56@example.com,+919553267090,403507,"Baina, Vasco",Truck 02 - Mapusa & North Coastal
-RR-280-992-057,Tablet,Vikram Naik,vikram.naik57@example.com,+919596165087,403401,Ponda City Center,Truck 05 - Ponda & Inland
-RR-899-446-058,Wireless Headphones,Priya Vaz,priya.vaz58@example.com,+919667791599,403802,"Altinho, Panaji",Truck 04 - Vasco & Mormugao
-RR-338-720-059,Gaming Laptop,Deepa Pereira,deepa.pereira59@example.com,+919903112215,403001,"Baina, Vasco",Truck 01 - Panjim & Tiswadi
-RR-641-831-060,Smartphone,Sneha Pereira,sneha.pereira60@example.com,+919270196695,403802,Candolim Main St,Truck 04 - Vasco & Mormugao
-RR-830-605-061,Mechanical Keyboard,Sarah Naik,sarah.naik61@example.com,+919628415290,403701,Calangute,Truck 03 - Margao & South Coastal
-RR-252-916-062,Running Shoes,Sarah Mendes,sarah.mendes62@example.com,+919386951273,403507,"Baina, Vasco",Truck 02 - Mapusa & North Coastal
-RR-383-302-063,Bluetooth Speaker,Sarah Naik,sarah.naik63@example.com,+919133804349,403401,Ponda City Center,Truck 05 - Ponda & Inland
-RR-860-783-064,Coffee Machine,Anjali Sinha,anjali.sinha64@example.com,+919486138782,403001,Candolim Main St,Truck 01 - Panjim & Tiswadi
-RR-705-359-065,Tablet,Arjun D'Souza,arjun.d'souza65@example.com,+919741008275,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
-RR-766-509-066,Wireless Headphones,Anjali Kamat,anjali.kamat66@example.com,+919264248093,403401,Calangute,Truck 05 - Ponda & Inland
-RR-980-201-067,Tablet,Sneha Pereira,sneha.pereira67@example.com,+919211344405,403401,Candolim Main St,Truck 05 - Ponda & Inland
-RR-376-216-068,Smartphone,Anjali Sharma,anjali.sharma68@example.com,+919690615996,403802,Candolim Main St,Truck 04 - Vasco & Mormugao
-RR-818-495-069,Mechanical Keyboard,Rohan Fernandes,rohan.fernandes69@example.com,+919163754858,403802,Calangute,Truck 04 - Vasco & Mormugao
-RR-829-719-070,Mechanical Keyboard,Arjun Pereira,arjun.pereira70@example.com,+919532498126,403701,"Baina, Vasco",Truck 03 - Margao & South Coastal
-RR-365-604-071,Wireless Headphones,Euan Sharma,euan.sharma71@example.com,+919997845136,403802,Mapusa Market,Truck 04 - Vasco & Mormugao
-RR-733-263-072,Wireless Headphones,Priya Kamat,priya.kamat72@example.com,+919619446201,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
-RR-502-192-073,Bluetooth Speaker,Euan Pereira,euan.pereira73@example.com,+919456563279,403802,Margao Market Area,Truck 04 - Vasco & Mormugao
-RR-477-185-074,Gaming Laptop,Vikram Gupta,vikram.gupta74@example.com,+919159951270,403507,"Altinho, Panaji",Truck 02 - Mapusa & North Coastal
-RR-645-565-075,Tablet,Priya Mendes,priya.mendes75@example.com,+919916489448,403401,Mapusa Market,Truck 05 - Ponda & Inland
-RR-141-325-076,Gaming Laptop,Priya Naik,priya.naik76@example.com,+919423235248,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
-RR-852-967-077,Mechanical Keyboard,Anjali Sinha,anjali.sinha77@example.com,+919539778916,403001,Ponda City Center,Truck 01 - Panjim & Tiswadi
-RR-561-704-078,Tablet,Kevin Kamat,kevin.kamat78@example.com,+919953402452,403701,Candolim Main St,Truck 03 - Margao & South Coastal
-RR-371-313-079,Gaming Laptop,Sneha Sharma,sneha.sharma79@example.com,+919825032493,403401,Colva Beach Rd,Truck 05 - Ponda & Inland
-RR-287-287-080,Football Boots,Kevin Gupta,kevin.gupta80@example.com,+919963418820,403001,Candolim Main St,Truck 01 - Panjim & Tiswadi
-RR-945-473-081,Smartphone,Vikram Sharma,vikram.sharma81@example.com,+919930432418,403401,Margao Market Area,Truck 05 - Ponda & Inland
-RR-587-196-082,Smartphone,Rohan D'Souza,rohan.d'souza82@example.com,+919764581419,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
-RR-636-929-083,Tablet,Deepa Kamat,deepa.kamat83@example.com,+919627823472,403701,Candolim Main St,Truck 03 - Margao & South Coastal
-RR-768-319-084,Running Shoes,Kevin Naik,kevin.naik84@example.com,+919369554042,403701,"Altinho, Panaji",Truck 03 - Margao & South Coastal
-RR-111-885-085,Wireless Headphones,Rohan Mendes,rohan.mendes85@example.com,+919599371159,403001,Colva Beach Rd,Truck 01 - Panjim & Tiswadi
-RR-913-871-086,Smartphone,Rohan Vaz,rohan.vaz86@example.com,+919160622141,403001,"Baina, Vasco",Truck 01 - Panjim & Tiswadi
-RR-180-775-087,Smart Watch,Sneha Gupta,sneha.gupta87@example.com,+919930806739,403001,Colva Beach Rd,Truck 01 - Panjim & Tiswadi
-RR-949-995-088,Football Boots,Sarah Gupta,sarah.gupta88@example.com,+919139442695,403401,Margao Market Area,Truck 05 - Ponda & Inland
-RR-261-871-089,Wireless Headphones,Anjali Sinha,anjali.sinha89@example.com,+919826649878,403701,"Baina, Vasco",Truck 03 - Margao & South Coastal
-RR-271-740-090,Football Boots,Arjun Vaz,arjun.vaz90@example.com,+919711020891,403401,Ponda City Center,Truck 05 - Ponda & Inland
-RR-995-587-091,Wireless Headphones,Kevin Sharma,kevin.sharma91@example.com,+919977461191,403001,Ponda City Center,Truck 01 - Panjim & Tiswadi
-RR-196-962-092,Smart Watch,Rohan Sinha,rohan.sinha92@example.com,+919657206180,403507,Calangute,Truck 02 - Mapusa & North Coastal
-RR-896-165-093,Bluetooth Speaker,Priya Gupta,priya.gupta93@example.com,+919287039269,403401,Mapusa Market,Truck 05 - Ponda & Inland
-RR-371-387-094,Running Shoes,Deepa D'Souza,deepa.d'souza94@example.com,+919573479089,403001,"Baina, Vasco",Truck 01 - Panjim & Tiswadi
-RR-730-497-095,Wireless Headphones,Sneha Fernandes,sneha.fernandes95@example.com,+919575062352,403802,"Altinho, Panaji",Truck 04 - Vasco & Mormugao
-RR-818-743-096,Football Boots,Deepa Naik,deepa.naik96@example.com,+919902752984,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
-RR-104-162-097,Gaming Laptop,Anjali Kamat,anjali.kamat97@example.com,+919105555761,403802,Margao Market Area,Truck 04 - Vasco & Mormugao
-RR-266-752-098,Mechanical Keyboard,Anjali Pereira,anjali.pereira98@example.com,+919306639143,403701,Candolim Main St,Truck 03 - Margao & South Coastal
-RR-694-245-099,Gaming Laptop,Euan Sharma,euan.sharma99@example.com,+919239746895,403507,Candolim Main St,Truck 02 - Mapusa & North Coastal
-RR-329-464-100,Mechanical Keyboard,Rohan Kamat,rohan.kamat100@example.com,+919124444473,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
+tracking_number,item_name,weight,customer_name,customer_email,customer_phone,zipcode,delivery_location,carrier
+RR-989-720-001,Bluetooth Speaker,1140,Deepa Fernandes,deepa.fernandes1@example.com,+919646197939,403507,Anjuna Beach Rd,Truck 02 - Mapusa & North Coastal
+RR-384-849-002,Mechanical Keyboard,413,Sarah Mendes,sarah.mendes2@example.com,+919519887983,403701,Old Goa,Truck 03 - Margao & South Coastal
+RR-432-713-003,Running Shoes,348,Euan Naik,euan.naik3@example.com,+919875150381,403701,Mapusa Market,Truck 03 - Margao & South Coastal
+RR-405-991-004,Coffee Machine,1991,Euan Mendes,euan.mendes4@example.com,+919224792231,403401,Anjuna Beach Rd,Truck 05 - Ponda & Inland
+RR-846-817-005,Coffee Machine,113,Anjali Kamat,anjali.kamat5@example.com,+919418748858,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
+RR-296-259-006,Bluetooth Speaker,1176,Euan Naik,euan.naik6@example.com,+919536526171,403001,Mapusa Market,Truck 01 - Panjim & Tiswadi
+RR-724-519-007,Smartphone,899,Sarah Naik,sarah.naik7@example.com,+919141022576,403701,Mapusa Market,Truck 03 - Margao & South Coastal
+RR-806-104-008,Running Shoes,1569,Euan Sinha,euan.sinha8@example.com,+919319853420,403001,"Baina, Vasco",Truck 01 - Panjim & Tiswadi
+RR-241-886-009,Coffee Machine,1808,Arjun Naik,arjun.naik9@example.com,+919468850643,403802,Old Goa,Truck 04 - Vasco & Mormugao
+RR-492-563-010,Wireless Headphones,1814,Euan Kamat,euan.kamat10@example.com,+919600830387,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
+RR-143-133-011,Wireless Headphones,525,Deepa D'Souza,deepa.d'souza11@example.com,+919715049530,403701,Ponda City Center,Truck 03 - Margao & South Coastal
+RR-147-605-012,Running Shoes,1100,Euan Pereira,euan.pereira12@example.com,+919451690648,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
+RR-145-103-013,Smartphone,1853,Vikram Pereira,vikram.pereira13@example.com,+919158125610,403507,Ponda City Center,Truck 02 - Mapusa & North Coastal
+RR-819-775-014,Mechanical Keyboard,1429,Priya D'Souza,priya.d'souza14@example.com,+919669346743,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-629-558-015,Tablet,249,Sneha Fernandes,sneha.fernandes15@example.com,+919542339279,403802,Candolim Main St,Truck 04 - Vasco & Mormugao
+RR-859-495-016,Tablet,1660,Arjun Vaz,arjun.vaz16@example.com,+919464945387,403001,Old Goa,Truck 01 - Panjim & Tiswadi
+RR-201-953-017,Tablet,1754,Sneha Sinha,sneha.sinha17@example.com,+919867586804,403507,Ponda City Center,Truck 02 - Mapusa & North Coastal
+RR-100-396-018,Mechanical Keyboard,1364,Deepa Pereira,deepa.pereira18@example.com,+919638094176,403701,Colva Beach Rd,Truck 03 - Margao & South Coastal
+RR-459-769-019,Football Boots,1210,Deepa Mendes,deepa.mendes19@example.com,+919327372074,403401,Margao Market Area,Truck 05 - Ponda & Inland
+RR-958-468-020,Wireless Headphones,1050,Vikram Pereira,vikram.pereira20@example.com,+919749313793,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-976-827-021,Smartphone,1129,Vikram Kamat,vikram.kamat21@example.com,+919597111739,403401,Calangute,Truck 05 - Ponda & Inland
+RR-633-294-022,Smart Watch,582,Sarah Fernandes,sarah.fernandes22@example.com,+919771151707,403507,Old Goa,Truck 02 - Mapusa & North Coastal
+RR-625-843-023,Smartphone,1791,Anjali Fernandes,anjali.fernandes23@example.com,+919135821695,403401,Ponda City Center,Truck 05 - Ponda & Inland
+RR-168-131-024,Mechanical Keyboard,1386,Sneha Naik,sneha.naik24@example.com,+919337614749,403001,Old Goa,Truck 01 - Panjim & Tiswadi
+RR-790-158-025,Tablet,649,Deepa Mendes,deepa.mendes25@example.com,+919353696090,403507,Anjuna Beach Rd,Truck 02 - Mapusa & North Coastal
+RR-767-729-026,Mechanical Keyboard,1402,Anjali Naik,anjali.naik26@example.com,+919646671917,403401,Colva Beach Rd,Truck 05 - Ponda & Inland
+RR-602-596-027,Tablet,1121,Kevin Vaz,kevin.vaz27@example.com,+919701522306,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-903-571-028,Tablet,507,Kevin Vaz,kevin.vaz28@example.com,+919353082656,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
+RR-377-910-029,Coffee Machine,1824,Kevin Naik,kevin.naik29@example.com,+919544348002,403507,"Altinho, Panaji",Truck 02 - Mapusa & North Coastal
+RR-400-437-030,Mechanical Keyboard,1650,Vikram Sinha,vikram.sinha30@example.com,+919441099013,403701,Candolim Main St,Truck 03 - Margao & South Coastal
+RR-762-246-031,Coffee Machine,1877,Sneha Vaz,sneha.vaz31@example.com,+919889210776,403401,Margao Market Area,Truck 05 - Ponda & Inland
+RR-551-134-032,Wireless Headphones,354,Deepa Kamat,deepa.kamat32@example.com,+919369980902,403802,Old Goa,Truck 04 - Vasco & Mormugao
+RR-760-346-033,Bluetooth Speaker,1132,Deepa Sinha,deepa.sinha33@example.com,+919428533523,403401,Candolim Main St,Truck 05 - Ponda & Inland
+RR-469-345-034,Football Boots,1082,Sarah Fernandes,sarah.fernandes34@example.com,+919629653620,403701,Mapusa Market,Truck 03 - Margao & South Coastal
+RR-816-800-035,Smartphone,1569,Sneha Mendes,sneha.mendes35@example.com,+919308896200,403001,Mapusa Market,Truck 01 - Panjim & Tiswadi
+RR-140-931-036,Wireless Headphones,879,Kevin Sinha,kevin.sinha36@example.com,+919699698936,403701,Mapusa Market,Truck 03 - Margao & South Coastal
+RR-577-122-037,Smartphone,1080,Sneha D'Souza,sneha.d'souza37@example.com,+919518120367,403802,Colva Beach Rd,Truck 04 - Vasco & Mormugao
+RR-582-840-038,Gaming Laptop,1519,Priya Vaz,priya.vaz38@example.com,+919335573302,403507,Colva Beach Rd,Truck 02 - Mapusa & North Coastal
+RR-988-398-039,Bluetooth Speaker,1129,Rohan Sinha,rohan.sinha39@example.com,+919842566103,403701,Calangute,Truck 03 - Margao & South Coastal
+RR-660-198-040,Coffee Machine,314,Priya D'Souza,priya.d'souza40@example.com,+919794321162,403507,Colva Beach Rd,Truck 02 - Mapusa & North Coastal
+RR-813-569-041,Tablet,26,Deepa Naik,deepa.naik41@example.com,+919213291906,403401,Ponda City Center,Truck 05 - Ponda & Inland
+RR-774-106-042,Smart Watch,501,Rohan Sinha,rohan.sinha42@example.com,+919751894076,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
+RR-278-723-043,Tablet,1322,Kevin Sinha,kevin.sinha43@example.com,+919713993723,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
+RR-705-351-044,Mechanical Keyboard,1668,Sarah Fernandes,sarah.fernandes44@example.com,+919183915393,403401,Old Goa,Truck 05 - Ponda & Inland
+RR-135-782-045,Gaming Laptop,1905,Sarah Naik,sarah.naik45@example.com,+919840164805,403001,Anjuna Beach Rd,Truck 01 - Panjim & Tiswadi
+RR-157-464-046,Coffee Machine,1999,Sneha D'Souza,sneha.d'souza46@example.com,+919543641370,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-804-127-047,Bluetooth Speaker,979,Arjun D'Souza,arjun.d'souza47@example.com,+919798933535,403401,"Baina, Vasco",Truck 05 - Ponda & Inland
+RR-471-687-048,Football Boots,1791,Vikram Gupta,vikram.gupta48@example.com,+919516004728,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-845-317-049,Smartphone,629,Anjali D'Souza,anjali.d'souza49@example.com,+919135316890,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
+RR-507-695-050,Coffee Machine,1199,Priya Mendes,priya.mendes50@example.com,+919528233350,403001,Colva Beach Rd,Truck 01 - Panjim & Tiswadi
+RR-901-574-051,Gaming Laptop,1321,Sarah Pereira,sarah.pereira51@example.com,+919170177537,403401,"Altinho, Panaji",Truck 05 - Ponda & Inland
+RR-788-754-052,Football Boots,1831,Arjun Sharma,arjun.sharma52@example.com,+919279472321,403802,Calangute,Truck 04 - Vasco & Mormugao
+RR-134-937-053,Gaming Laptop,1745,Priya Kamat,priya.kamat53@example.com,+919934924461,403701,Margao Market Area,Truck 03 - Margao & South Coastal
+RR-428-612-054,Smart Watch,921,Vikram Fernandes,vikram.fernandes54@example.com,+919729306752,403001,Margao Market Area,Truck 01 - Panjim & Tiswadi
+RR-571-244-055,Gaming Laptop,489,Arjun Naik,arjun.naik55@example.com,+919872369066,403001,"Altinho, Panaji",Truck 01 - Panjim & Tiswadi
+RR-317-832-056,Tablet,1382,Euan Kamat,euan.kamat56@example.com,+919690816629,403507,Anjuna Beach Rd,Truck 02 - Mapusa & North Coastal
+RR-552-734-057,Tablet,1859,Euan Sharma,euan.sharma57@example.com,+919608393909,403401,Old Goa,Truck 05 - Ponda & Inland
+RR-168-297-058,Running Shoes,455,Anjali Kamat,anjali.kamat58@example.com,+919880091463,403401,Ponda City Center,Truck 05 - Ponda & Inland
+RR-922-115-059,Smart Watch,400,Kevin Mendes,kevin.mendes59@example.com,+919840112444,403701,Margao Market Area,Truck 03 - Margao & South Coastal
+RR-528-751-060,Bluetooth Speaker,149,Arjun Gupta,arjun.gupta60@example.com,+919607294928,403802,"Baina, Vasco",Truck 04 - Vasco & Mormugao
+RR-973-754-061,Gaming Laptop,405,Vikram Sinha,vikram.sinha61@example.com,+919205987051,403507,Calangute,Truck 02 - Mapusa & North Coastal
+RR-602-983-062,Coffee Machine,1057,Rohan D'Souza,rohan.d'souza62@example.com,+919905359655,403701,Candolim Main St,Truck 03 - Margao & South Coastal
+RR-242-470-063,Smart Watch,1016,Vikram Sharma,vikram.sharma63@example.com,+919396962305,403001,Old Goa,Truck 01 - Panjim & Tiswadi
+RR-991-355-064,Bluetooth Speaker,1243,Deepa Mendes,deepa.mendes64@example.com,+919681164496,403001,Margao Market Area,Truck 01 - Panjim & Tiswadi
+RR-864-217-065,Running Shoes,922,Priya Vaz,priya.vaz65@example.com,+919818655470,403701,"Baina, Vasco",Truck 03 - Margao & South Coastal
+RR-638-471-066,Gaming Laptop,758,Anjali Mendes,anjali.mendes66@example.com,+919549319703,403701,Calangute,Truck 03 - Margao & South Coastal
+RR-199-540-067,Gaming Laptop,1489,Priya Sharma,priya.sharma67@example.com,+919785704882,403802,Margao Market Area,Truck 04 - Vasco & Mormugao
+RR-779-979-068,Football Boots,228,Vikram Sharma,vikram.sharma68@example.com,+919133952695,403507,"Baina, Vasco",Truck 02 - Mapusa & North Coastal
+RR-784-256-069,Mechanical Keyboard,1019,Euan Sinha,euan.sinha69@example.com,+919905276786,403507,"Altinho, Panaji",Truck 02 - Mapusa & North Coastal
+RR-118-876-070,Coffee Machine,1983,Arjun Gupta,arjun.gupta70@example.com,+919447934570,403507,"Altinho, Panaji",Truck 02 - Mapusa & North Coastal
+RR-860-370-071,Wireless Headphones,1973,Vikram Fernandes,vikram.fernandes71@example.com,+919253505179,403701,Colva Beach Rd,Truck 03 - Margao & South Coastal
+RR-574-202-072,Bluetooth Speaker,1124,Anjali Gupta,anjali.gupta72@example.com,+919397726028,403701,"Altinho, Panaji",Truck 03 - Margao & South Coastal
+RR-243-655-073,Running Shoes,1562,Euan Vaz,euan.vaz73@example.com,+919283190239,403701,Anjuna Beach Rd,Truck 03 - Margao & South Coastal
+RR-872-654-074,Gaming Laptop,59,Euan Vaz,euan.vaz74@example.com,+919151932688,403701,"Baina, Vasco",Truck 03 - Margao & South Coastal
+RR-771-972-075,Wireless Headphones,1668,Priya Naik,priya.naik75@example.com,+919691853186,403001,Margao Market Area,Truck 01 - Panjim & Tiswadi
+RR-174-920-076,Running Shoes,215,Sarah Vaz,sarah.vaz76@example.com,+919616098417,403001,Old Goa,Truck 01 - Panjim & Tiswadi
+RR-295-642-077,Smartphone,898,Sarah Sharma,sarah.sharma77@example.com,+919175554963,403401,Anjuna Beach Rd,Truck 05 - Ponda & Inland
+RR-118-489-078,Wireless Headphones,53,Sarah Sinha,sarah.sinha78@example.com,+919581468880,403701,Colva Beach Rd,Truck 03 - Margao & South Coastal
+RR-325-883-079,Bluetooth Speaker,770,Kevin Sharma,kevin.sharma79@example.com,+919536774916,403701,Colva Beach Rd,Truck 03 - Margao & South Coastal
+RR-477-380-080,Wireless Headphones,905,Vikram Sinha,vikram.sinha80@example.com,+919705262694,403507,Margao Market Area,Truck 02 - Mapusa & North Coastal
+RR-558-735-081,Smart Watch,181,Deepa D'Souza,deepa.d'souza81@example.com,+919594742243,403001,Calangute,Truck 01 - Panjim & Tiswadi
+RR-540-777-082,Running Shoes,1322,Sarah Mendes,sarah.mendes82@example.com,+919529574811,403802,Anjuna Beach Rd,Truck 04 - Vasco & Mormugao
+RR-685-155-083,Tablet,184,Arjun Kamat,arjun.kamat83@example.com,+919233854790,403802,Colva Beach Rd,Truck 04 - Vasco & Mormugao
+RR-641-151-084,Smartphone,754,Kevin Naik,kevin.naik84@example.com,+919790865763,403401,Candolim Main St,Truck 05 - Ponda & Inland
+RR-783-470-085,Running Shoes,1552,Deepa Sharma,deepa.sharma85@example.com,+919520096605,403401,Calangute,Truck 05 - Ponda & Inland
+RR-919-740-086,Running Shoes,751,Rohan Pereira,rohan.pereira86@example.com,+919230344447,403001,Old Goa,Truck 01 - Panjim & Tiswadi
+RR-779-224-087,Tablet,117,Arjun Gupta,arjun.gupta87@example.com,+919259190632,403001,Margao Market Area,Truck 01 - Panjim & Tiswadi
+RR-322-842-088,Wireless Headphones,1636,Priya Vaz,priya.vaz88@example.com,+919320744176,403802,"Altinho, Panaji",Truck 04 - Vasco & Mormugao
+RR-360-665-089,Smart Watch,977,Sarah Sharma,sarah.sharma89@example.com,+919153986723,403401,Calangute,Truck 05 - Ponda & Inland
+RR-781-488-090,Running Shoes,903,Kevin Fernandes,kevin.fernandes90@example.com,+919390686233,403802,Colva Beach Rd,Truck 04 - Vasco & Mormugao
+RR-169-730-091,Running Shoes,676,Anjali Pereira,anjali.pereira91@example.com,+919790249929,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-421-349-092,Smart Watch,341,Euan Kamat,euan.kamat92@example.com,+919344976609,403401,Calangute,Truck 05 - Ponda & Inland
+RR-527-439-093,Bluetooth Speaker,875,Deepa Kamat,deepa.kamat93@example.com,+919377236445,403507,Calangute,Truck 02 - Mapusa & North Coastal
+RR-156-242-094,Coffee Machine,871,Kevin Mendes,kevin.mendes94@example.com,+919357031615,403802,Old Goa,Truck 04 - Vasco & Mormugao
+RR-453-808-095,Running Shoes,13,Deepa Pereira,deepa.pereira95@example.com,+919699549535,403507,Calangute,Truck 02 - Mapusa & North Coastal
+RR-109-952-096,Smartphone,1270,Kevin Pereira,kevin.pereira96@example.com,+919379706961,403802,Margao Market Area,Truck 04 - Vasco & Mormugao
+RR-145-831-097,Football Boots,37,Anjali Sinha,anjali.sinha97@example.com,+919626453652,403507,Colva Beach Rd,Truck 02 - Mapusa & North Coastal
+RR-968-106-098,Smart Watch,1278,Vikram Sinha,vikram.sinha98@example.com,+919742957657,403507,Mapusa Market,Truck 02 - Mapusa & North Coastal
+RR-544-529-099,Wireless Headphones,1454,Arjun Sinha,arjun.sinha99@example.com,+919810274646,403701,Margao Market Area,Truck 03 - Margao & South Coastal
+RR-636-293-100,Mechanical Keyboard,208,Priya Mendes,priya.mendes100@example.com,+919506477345,403507,Margao Market Area,Truck 02 - Mapusa & North Coastal

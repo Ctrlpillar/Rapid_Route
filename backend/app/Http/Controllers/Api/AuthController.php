@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Models\Team; // <-- IMPORTED TEAM MODEL
+use App\Models\Team; 
+use App\Models\Order; // <-- ADDED THIS IMPORT
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
@@ -16,8 +17,25 @@ use Exception;
 class AuthController extends Controller
 {
     /**
+     * --- DASHBOARD OVERVIEW STATS ---
+     * Fetches live counts for Admin overview cards.
+     */
+    public function getAdminStats()
+    {
+        try {
+            return response()->json([
+                'total_shipments' => Order::count(),
+                'total_customers' => User::where('role', 'user')->count(),
+                'active_fleet'    => Team::count(),
+                'pending_orders'  => Order::where('status', 'pending')->count(),
+            ]);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error fetching stats'], 500);
+        }
+    }
+
+    /**
      * --- DRIVER LOGIN ---
-     * Authenticates fleet members using the 'teams' table.
      */
     public function driverLogin(Request $request)
     {
@@ -26,14 +44,12 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Look for the driver in the 'teams' table specifically
         $driver = Team::where('company_email', $request->company_email)->first();
 
         if (!$driver || !Hash::check($request->password, $driver->password)) {
             return response()->json(['message' => 'Invalid company credentials.'], 401);
         }
 
-        // Generate a driver-specific token
         $token = $driver->createToken('driver_token')->plainTextToken;
 
         return response()->json([
@@ -43,13 +59,12 @@ class AuthController extends Controller
                 'name' => $driver->full_name,
                 'email' => $driver->company_email,
                 'assigned_truck' => $driver->assigned_truck,
-                'role' => 'driver' // Adding role for frontend routing
+                'role' => 'driver' 
             ]
         ]);
     }
 
-    // --- ADMIN LOGIN (SECURE SANCTUM INTEGRATION) ---
-    
+    // --- ADMIN LOGIN ---
     public function adminLogin(Request $request) 
     {
         $request->validate([
@@ -62,7 +77,6 @@ class AuthController extends Controller
 
         if ($request->email === $adminEmail && $request->password === $adminPass) {
             
-            // Ensure the admin actually exists in the database so Sanctum can issue a real token
             $admin = User::firstOrCreate(
                 ['email' => $adminEmail],
                 [
@@ -73,7 +87,6 @@ class AuthController extends Controller
                 ]
             );
 
-            // Generate a REAL Sanctum token
             $token = $admin->createToken('admin_token')->plainTextToken;
 
             return response()->json([
@@ -90,7 +103,6 @@ class AuthController extends Controller
     }
 
     // --- FORGOT PASSWORD / 2FA METHODS ---
-
     public function sendResetCode(Request $request)
     {
         $request->validate(['email' => 'required|email']);
@@ -151,7 +163,6 @@ class AuthController extends Controller
     }
 
     // --- GOOGLE METHODS ---
-
     public function redirectToGoogle()
     {
         return Socialite::driver('google')->stateless()->redirect();
@@ -163,11 +174,12 @@ class AuthController extends Controller
             $googleUser = Socialite::driver('google')->stateless()->user();
             
             $user = User::updateOrCreate([
-                'email' => $googleUser->email, 
+                'email' => $googleUser->getEmail(), 
             ], [
-                'name' => $googleUser->name,
-                'google_id' => $googleUser->id,
+                'name' => $googleUser->getName(),
+                'google_id' => $googleUser->getId(),
                 'google_token' => $googleUser->token,
+                'avatar' => $googleUser->getAvatar(),
                 'is_approved' => true, 
                 'role' => 'user',
             ]);
@@ -181,7 +193,6 @@ class AuthController extends Controller
     }
 
     // --- STANDARD AUTH METHODS ---
-
     public function register(Request $request)
     {
         $request->validate([
@@ -225,7 +236,7 @@ class AuthController extends Controller
 
         return response()->json([
             'token' => $user->createToken('auth_token')->plainTextToken,
-            'user' => $user
+            'user' => $user 
         ]);
     }
 
@@ -233,5 +244,21 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
+    }
+
+    /**
+     * --- MANUAL PHOTO UPLOAD ---
+     */
+    public function uploadAvatar(Request $request)
+    {
+        $request->validate(['avatar' => 'required|image|max:2048']);
+        $user = $request->user();
+        $path = $request->file('avatar')->store('avatars', 'public');
+        $user->update(['avatar' => '/storage/' . $path]);
+
+        return response()->json([
+            'message' => 'Profile photo updated!',
+            'avatar_url' => url('/storage/' . $path)
+        ]);
     }
 }

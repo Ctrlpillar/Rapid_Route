@@ -11,11 +11,30 @@ use Carbon\Carbon;
 class OrderController extends Controller
 {
     /**
+     * Helper to format grams to kg for the API response.
+     */
+    private function formatWeight($grams)
+    {
+        if (!$grams || $grams < 10) $grams = 10;
+        
+        if ($grams >= 1000) {
+            $kg = $grams / 1000;
+            // Returns '1kg' if whole, else '1.2kg'
+            return (fmod($kg, 1) == 0) ? $kg . 'kg' : number_format($kg, 1) . 'kg';
+        }
+        return $grams . 'g';
+    }
+
+    /**
      * Fetch all orders for the Admin table.
      */
     public function index()
     {
-        return response()->json(Order::latest()->get());
+        $orders = Order::latest()->get()->map(function($order) {
+            $order->formatted_weight = $this->formatWeight($order->weight);
+            return $order;
+        });
+        return response()->json($orders);
     }
 
     /**
@@ -42,11 +61,8 @@ class OrderController extends Controller
             return response()->json(['message' => 'No truck assigned to this driver.'], 403);
         }
 
-        // --- UPDATED: Smart Driver Manifest Lookup ---
-        // Extract just the "Truck 03" prefix
         $truckPrefix = trim(explode('-', $driver->assigned_truck)[0]);
 
-        // Find active shipments where the carrier starts with "Truck 03"
         return response()->json(
             Order::where('carrier', 'LIKE', $truckPrefix . '%')
                 ->whereNotIn('status', ['delivered', 'cancelled'])
@@ -66,8 +82,6 @@ class OrderController extends Controller
 
         $order = Order::findOrFail($id);
         
-        // --- UPDATED: Smart Security Check ---
-        // We only care if the "Truck XX" parts match, ignoring the region text.
         $driverTruckPrefix = trim(explode('-', $request->user()->assigned_truck)[0]);
         $orderCarrierPrefix = trim(explode('-', $order->carrier)[0]);
 
@@ -81,7 +95,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Store new orders (Single entry or array via JSON).
+     * Store new orders (Now includes weight).
      */
     public function store(Request $request)
     {
@@ -89,6 +103,7 @@ class OrderController extends Controller
             'orders' => 'required|array',
             'orders.*.tracking_number' => 'required|unique:orders,tracking_number',
             'orders.*.item_name'       => 'nullable|string',
+            'orders.*.weight'          => 'nullable|integer', // Added weight validation
             'orders.*.customer_name'   => 'required|string',
             'orders.*.customer_email'  => 'nullable|email',
             'orders.*.customer_phone'  => 'nullable|string',
@@ -100,6 +115,7 @@ class OrderController extends Controller
 
         foreach ($data['orders'] as $orderData) {
             $orderData['item_name'] = $orderData['item_name'] ?? 'Standard Parcel';
+            $orderData['weight'] = $orderData['weight'] ?? 10; // Default to 10g
             Order::create($orderData);
         }
 
@@ -109,7 +125,7 @@ class OrderController extends Controller
     }
 
     /**
-     * NATIVE CSV BULK UPLOAD
+     * NATIVE CSV BULK UPLOAD (Now supports weight column).
      */
     public function bulkUpload(Request $request)
     {
@@ -118,7 +134,6 @@ class OrderController extends Controller
         ]);
 
         $file = $request->file('file');
-        
         $fileData = file($file->getRealPath());
         $data = array_map('str_getcsv', $fileData);
         
@@ -129,15 +144,14 @@ class OrderController extends Controller
         $importedCount = 0;
 
         foreach ($data as $row) {
-            if (count($headers) !== count($row)) {
-                continue; 
-            }
+            if (count($headers) !== count($row)) continue; 
 
             $rowData = array_combine($headers, $row);
 
             Order::create([
                 'tracking_number'   => $rowData['tracking_number'] ?? 'RR-' . rand(10000, 99999),
                 'item_name'         => $rowData['item_name'] ?? 'Standard Parcel',
+                'weight'            => isset($rowData['weight']) ? intval($rowData['weight']) : 10, // Catch weight from CSV
                 'customer_name'     => $rowData['customer_name'] ?? 'Unknown Customer',
                 'customer_email'    => $rowData['customer_email'] ?? null,
                 'customer_phone'    => $rowData['customer_phone'] ?? null,
@@ -150,14 +164,9 @@ class OrderController extends Controller
             $importedCount++;
         }
 
-        return response()->json([
-            'message' => "$importedCount orders imported successfully!"
-        ]);
+        return response()->json(['message' => "$importedCount orders imported successfully!"]);
     }
 
-    /**
-     * Admin: Update order status.
-     */
     public function updateStatus(Request $request, $id)
     {
         $request->validate(['status' => 'required|string']);
@@ -166,9 +175,6 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order status updated successfully.']);
     }
 
-    /**
-     * Delete an order.
-     */
     public function destroy($id)
     {
         $order = Order::findOrFail($id);
@@ -177,7 +183,7 @@ class OrderController extends Controller
     }
 
     /**
-     * Public endpoint to track an order.
+     * Public endpoint to track an order (Includes formatted weight).
      */
     public function trackOrder($tracking_number)
     {
@@ -199,6 +205,7 @@ class OrderController extends Controller
             'location' => 'Panaji Sorting Hub, Goa'
         ];
 
+        // ... [Tracking event logic remains the same] ...
         if (in_array($order->status, ['approved', 'in_transit', 'out_for_delivery', 'delivered'])) {
             $events[] = [
                 'date' => (clone $created)->addHours(2)->format('M d, g:i A'),
@@ -244,27 +251,12 @@ class OrderController extends Controller
         }
 
         $targetDate = (clone $created)->addDay()->setTime(18, 0, 0);
-        $estDelivery = 'Within 24 Hours';
-
-        if ($order->status === 'delivered') {
-            $estDelivery = 'Delivered';
-        } elseif ($order->status === 'cancelled') {
-            $estDelivery = 'Cancelled';
-        } else {
-            if ($targetDate->isToday()) {
-                $estDelivery = 'Today by ' . $targetDate->format('g:i A');
-            } elseif ($targetDate->isTomorrow()) {
-                $estDelivery = 'Tomorrow by ' . $targetDate->format('g:i A');
-            } else {
-                $estDelivery = $targetDate->format('M d, Y') . ' by ' . $targetDate->format('g:i A');
-            }
-        }
+        $estDelivery = $order->status === 'delivered' ? 'Delivered' : ($order->status === 'cancelled' ? 'Cancelled' : 'Within 24 Hours');
 
         $driverPhone = null;
         try {
             $truckPrefix = trim(explode('-', $order->carrier)[0]); 
             $driver = Team::where('assigned_truck', 'LIKE', $truckPrefix . '%')->first();
-                          
             $driverPhone = $driver ? $driver->phone : null;
         } catch (\Exception $e) {
             $driverPhone = null; 
@@ -274,6 +266,7 @@ class OrderController extends Controller
             'trackingNumber' => $order->tracking_number,
             'status' => ucfirst(str_replace('_', ' ', $order->status)),
             'item' => $order->item_name ?? 'Standard Parcel', 
+            'weight' => $this->formatWeight($order->weight), // Formatted for tracking page
             'carrier' => $order->carrier,
             'estimatedDelivery' => $estDelivery,
             'currentLocation' => $order->status === 'delivered' ? $order->delivery_location : 'Goa Route',
@@ -282,7 +275,6 @@ class OrderController extends Controller
             'customerName' => $order->customer_name,
             'deliveryAddress' => $order->delivery_location,
             'zipcode' => $order->zipcode,
-            
             'driver_phone' => $driverPhone
         ]);
     }

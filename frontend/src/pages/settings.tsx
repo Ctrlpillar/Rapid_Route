@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { 
-  User, Camera, Shield, Link as LinkIcon, Loader2, Trash2, 
-  AlertTriangle, KeyRound, LogIn, Eye, EyeOff, Package, 
+  User, Shield, Loader2, Trash2, KeyRound, LogIn, Eye, Package, 
   Clock, MapPin, CheckCircle2, XCircle, ChevronRight 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,6 @@ export default function Settings() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState("personal");
 
-  // History State
   const [history, setHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
 
@@ -48,7 +46,6 @@ export default function Settings() {
     }
   }, [user]);
 
-  // Fetch History when the tab changes
   useEffect(() => {
     if (activeTab === "orders" && user) {
       fetchHistory();
@@ -147,7 +144,6 @@ export default function Settings() {
           <Button variant={activeTab === "security" ? "secondary" : "ghost"} onClick={() => setActiveTab("security")} className={`w-full justify-start font-medium ${activeTab === "security" ? "bg-primary/10 text-primary" : "text-muted-foreground"}`}>
             <Shield className="mr-2 w-4 h-4" /> Security
           </Button>
-          {/* NEW TAB BUTTON */}
           <Button variant={activeTab === "orders" ? "secondary" : "ghost"} onClick={() => setActiveTab("orders")} className={`w-full justify-start font-medium ${activeTab === "orders" ? "bg-primary/10 text-primary" : "text-muted-foreground"}`}>
             <Package className="mr-2 w-4 h-4" /> Order History
           </Button>
@@ -158,11 +154,23 @@ export default function Settings() {
             <form onSubmit={handleProfileUpdate} className="space-y-8">
                <Card className="shadow-sm">
                 <CardContent className="p-6 flex flex-col sm:flex-row items-center gap-6">
-                  <div className="w-24 h-24 rounded-full bg-primary text-white flex items-center justify-center text-3xl font-bold border-4 border-white shadow-md">{user?.name?.charAt(0)}</div>
+                  <div className="relative w-24 h-24 rounded-full bg-primary text-white flex items-center justify-center text-3xl font-bold border-4 border-white shadow-md overflow-hidden">
+                    {user?.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt="Profile" 
+                        referrerPolicy="no-referrer"
+                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      user?.name?.charAt(0).toUpperCase()
+                    )}
+                  </div>
+
                   <div className="text-center sm:text-left">
                     <h3 className="font-semibold text-lg">{user?.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{user?.email}</p>
-                    <div className="flex gap-2"><Button variant="outline" size="sm">Upload Photo</Button></div>
+                    <p className="text-sm text-muted-foreground">{user?.email}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -172,7 +180,7 @@ export default function Settings() {
                 <CardContent className="space-y-4">
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2"><label className="text-sm font-medium">Full Name</label><Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="bg-slate-50" /></div>
-                    <div className="space-y-2"><label className="text-sm font-medium">Email Address</label><Input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} className="bg-slate-50" /></div>
+                    <div className="space-y-2"><label className="text-sm font-medium">Email Address</label><Input type="email" value={formData.email} className="bg-slate-50" disabled /></div>
                   </div>
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div className="space-y-2"><label className="text-sm font-medium">Phone Number</label><Input value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+91 00000 00000" className="bg-slate-50" /></div>
@@ -216,11 +224,10 @@ export default function Settings() {
             </div>
           )}
 
-          {/* NEW SECTION: ORDER HISTORY */}
           {activeTab === "orders" && (
             <div className="space-y-4">
               <h2 className="text-xl font-bold">Transaction History</h2>
-              <p className="text-sm text-muted-foreground">Delivered or cancelled shipments linked to <b>{user.email}</b>.</p>
+              <p className="text-sm text-muted-foreground">Completed or cancelled shipments linked to <b>{user.email}</b>.</p>
 
               {loadingHistory ? (
                 <div className="py-20 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /></div>

@@ -20,6 +20,7 @@ class User extends Authenticatable
         'role',
         'is_approved',
         'google_id',
+        
         'google_token',
     ];
 

@@ -22,6 +22,7 @@ class Order extends Model
         'carrier', 
         'zipcode',
         'item_name', 
+        'weight',
         'status'
         
     ];

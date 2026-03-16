@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable(); // Nullable for Google users
+            $table->string('avatar')->nullable();
             
             $table->string('role')->default('user'); 
             $table->boolean('is_approved')->default(true);

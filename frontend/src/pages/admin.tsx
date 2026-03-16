@@ -28,7 +28,7 @@ export type OrderStatus = "pending" | "approved" | "in_transit" | "out_for_deliv
 export interface AdminOrder {
   id: string; trackingNumber: string; orderName: string;
   customerName: string; customerEmail: string; customerPhone?: string;
-  deliveryLocation?: string; carrier: string; status: OrderStatus; createdAt: string; zipcode: string;
+  deliveryLocation?: string; carrier: string; status: OrderStatus; createdAt: string; zipcode: string;formatted_weight?: string;
 }
 
 // --- MOCK CHART DATA ---

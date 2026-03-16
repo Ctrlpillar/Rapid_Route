@@ -43,6 +43,7 @@ interface User {
   initials: string;
   phone?: string;
   website?: string;
+  avatar?: string;
   orders: Order[];
 }
 
