@@ -18,9 +18,9 @@ export default function DriverLogin() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8000/api/driver/login", {
-        company_email: email,
-        password: password
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/driver/login`, {
+      company_email: email,
+      password: password
       });
 
       // Store Driver specific data
