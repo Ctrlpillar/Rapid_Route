@@ -74,4 +74,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/team/{id}/reset-link', [TeamController::class, 'generateResetLink']); 
     Route::delete('/admin/team/{id}', [TeamController::class, 'destroy']);
     
+    // --- ADMIN DASHBOARD STATS ---
+    Route::get('/admin/stats', [AuthController::class, 'getAdminStats']);
 });
